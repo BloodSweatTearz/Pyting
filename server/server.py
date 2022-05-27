@@ -160,7 +160,7 @@ class Server:
         recv_packet = js.loads(recv_packet)
         print("recv_packet:" ,recv_packet) # test
         chan = {"name": "general", "id": str(uuid1())}
-        username = recv_packet['username']
+        username = recv_packet['msg']['id']
         self.CLIENT_LIST[c] = username
 
         recv_cmd = recv_packet['cmd']
