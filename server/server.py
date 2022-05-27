@@ -119,16 +119,16 @@ class Server:
         print("DEBUG_send_to_client1 : ",msg)
         print("DEBUG_send_to_client2 : ",rooms)
         if flag == 0:
-            c.send(packet_encrypt(js.dumps({"rooms": rooms, "msg": msg})).encode(encoding="utf-8"))
+            c.send(packet_encrypt(js.dumps({"rooms": rooms, "username" : username, "msg": msg})).encode(encoding="utf-8"))
         elif flag == 1:
-            self.send_all(js.dumps({"rooms": rooms, "msg": msg}), chan)
+            self.send_all(js.dumps({"rooms": rooms, "username" : username, "msg": msg}), chan)
         elif flag == 2:
-            self.send_user(js.dumps({"rooms": rooms, "msg": msg}), username, chan)
+            self.send_user(js.dumps({"rooms": rooms,"username" : username, "msg": msg}), username, chan)
         else:
             pass
 
-    def message_format(self, username, text=""):
-        return { 'username': username, 'text': text }
+    def message_format(self, username, message):
+        return { 'username': username, 'msg': message }
 
     # password는 아직은 평문
     def add_user(self, username, password): # register
@@ -175,15 +175,15 @@ class Server:
         if(recv_cmd == 2): # login
             login_success = self.user_login_check(recv_packet)
             if(login_success):
-                self.send_to_client(c=c, msg=True, flag=0)
+                self.send_to_client(c=c, username=username, msg=True, flag=0)
             else:
-                self.send_to_client(c=c, msg=False, flag=0)    
+                self.send_to_client(c=c, username=username, msg=False, flag=0)
                 return
         if(recv_cmd == 3): # register
             if(self.add_user(recv_packet['msg']['id'], recv_packet['msg']['pw'])):
-                self.send_to_client(c=c, msg=True, flag=0)
+                self.send_to_client(c=c, username=username, msg=True, flag=0)
             else:
-                self.send_to_client(c=c, msg=False, flag=0)    
+                self.send_to_client(c=c, username=username, msg=False, flag=0)
                 #self.ACTIVE = False
             return
             
@@ -251,8 +251,7 @@ class Server:
             else:
                 for name in emoticons.keys():
                     message = message.replace(name, emoticons[name])
-                message = user_string + message
-                self.send_to_client(chan, message, flag=1)
+                self.send_to_client(chan, username, message, flag=1)
 
     def receive_command(self):
         while self.ACTIVE:
@@ -260,7 +259,7 @@ class Server:
             if command.startswith("/say"):
                 comment = command.split(' ', 1)
                 if len(command.split(' ')) > 1:
-                    self.send_to_client(ADMIN_PERM, f"\n[NOTICE] {comment[1]}", flag=1)
+                    self.send_to_client(ADMIN_PERM, "[Notice] {}".format(comment[1]), flag=1, username="ADMIN")
                 else:
                     print(f"Usage: {comment[0]} [something]")
             elif command.startswith("/kick"):
