@@ -94,8 +94,9 @@ class Server:
         print(f"Server live on {self.IP_ADDRESS}:{self.PORT}.")
         self.SERVER_LOOP = Thread(target=self.listen_incoming)
         self.SERVER_LOOP.start()
+        Thread(target=self.receive_command, args=()).start()
         self.SERVER_LOOP.join()
-
+        
     def listen_incoming(self):
         self.SERVER.listen(self.MAX_CLIENTS)
         print(f"Currently listening for up to {self.MAX_CLIENTS} clients...\n")
@@ -105,9 +106,9 @@ class Server:
             if(not self.ACTIVE):
                 return
             print(f" * {address[0]}:{address[1]} has connected.")
-            Thread(target=self.client_thread, args=(client, )).start()
-            Thread(target=self.receive_command, args=(client, )).start()
-
+            client_t = Thread(target=self.client_thread, args=(client, ))
+            client_t.start()
+            
             '''
             login_info = client.recv(self.RECV_SIZE).decode("utf8")
             login_info = packet_decrypt(login_info)
@@ -151,6 +152,10 @@ class Server:
         
         user_info = {}
         self.LOCK.acquire() # Race Condition 방지
+        if(username in self.USERS.keys()):
+            self.LOCK.release()
+            return False
+
         # load
         with open(self.USER_INFO_FILENAME, 'r') as fp:
             user_info = js.loads(fp.read())
@@ -161,11 +166,16 @@ class Server:
 
         print(f"[O] Register Success : {username}, {password}")
         self.LOCK.release()
+        self.load_users()
         return True
 
     def client_thread(self, c):
         if(not self.ACTIVE):
             return
+        '''
+        if(not self.list[idx]['recvcmd'].is_alive()):
+            return
+        '''
         recv_packet = c.recv(self.RECV_SIZE).decode("utf8")
         recv_packet = packet_decrypt(recv_packet)
         recv_packet = js.loads(recv_packet)
@@ -183,30 +193,28 @@ class Server:
         private_string = "[" + username + "] "
         welcome_message = f" * You have connected to the server at {self.IP_ADDRESS}."
 
+        if(recv_cmd == 2): # login
+            login_success = self.user_login_check(recv_packet)
+            if(login_success):
+                self.send_to_client(c=c, msg=True, flag=0)
+            else:
+                self.send_to_client(c=c, msg=False, flag=0)    
+                return
+        if(recv_cmd == 3): # register
+            if(self.add_user(recv_packet['msg']['id'], recv_packet['msg']['pw'])):
+                self.send_to_client(c=c, msg=True, flag=0)
+            else:
+                self.send_to_client(c=c, msg=False, flag=0)    
+                self.ACTIVE = False
+            return
+            
+
         ## legacy code
         # flag가 0인 경우, 사실 그냥 welcome_message만 보내도 됨.
         # self.send_to_client(c=c, msg=welcome_message, flag=0)
         # join_message = f" * {username} has joined the server."
         # self.send_to_client(chan, join_message, flag=1)
         while self.ACTIVE:
-            if(not self.ACTIVE):
-                return
-            if(recv_cmd == 2): # login
-                login_success = self.user_login_check(recv_packet)
-                if(login_success):
-                    self.send_to_client(c=c, msg=True, flag=0)
-                else:
-                    self.send_to_client(c=c, msg=False, flag=0)    
-                return
-            if(recv_cmd == 3): # register
-                if(self.add_user(recv_packet['msg']['id'], recv_packet['msg']['pw'])):
-                    self.send_to_client(c=c, msg=True, flag=0)
-                else:
-                    self.send_to_client(c=c, msg=False, flag=0)    
-                    self.ACTIVE = False
-                return
-            
-            
             message = c.recv(self.RECV_SIZE).decode("utf8")
             message = packet_decrypt(message)
             pkt = js.loads(message)
@@ -267,7 +275,7 @@ class Server:
                 message = user_string + message
                 self.send_to_client(chan, message, flag=1)
 
-    def receive_command(self, c):
+    def receive_command(self):
         while self.ACTIVE:
             command = input("[>] ")
             if command.startswith("/say"):
@@ -286,7 +294,6 @@ class Server:
                 choose = input("Are you sure to shutdown the server? (y/n):")
                 if choose == 'y':
                     self.send_to_client(ADMIN_PERM, "\n[!] The server will be closed.", flag=1)
-                    c.close()
                     self.SERVER.close()
                     self.ACTIVE = False # TEST
                     exit(0)
