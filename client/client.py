@@ -213,7 +213,12 @@ class Client:
     
     def print_message(self):
         while self.ACTIVE:
-            print("hi ", self.receive_message()['msg'])
+            packet_data = self.receive_message()
+            print("recv ", packet_data)
+            if packet_data["username"] != self.USERNAME:
+                from PyQt5.QtWidgets import QListWidgetItem
+                item = QListWidgetItem('[{}] {}'.format(packet_data["username"], packet_data["msg"]))
+                self.roomlist.addItem(item)
 
     def run_client(self):
         self.setup()
