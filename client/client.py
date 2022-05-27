@@ -91,6 +91,8 @@ class Client:
         print("WHAT????:",info_result)
 
         if(info_result['msg'] == True): # msg가 참이면 로그인 성공
+            self.USERNAME = username
+            self.PASSWORD = password
             return True
         return False
         # return info_result['msg']
