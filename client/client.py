@@ -56,9 +56,10 @@ class Client:
 
     def start_io_loop(self):
         if self.ACTIVE:
+            print("[THREAD] print_message()를 쓰레드에 등록합니다.")
             self.RECEIVE_THREAD = Thread(target=self.print_message)
             self.RECEIVE_THREAD.start()
-            self.RECEIVE_THREAD.join()
+            #self.RECEIVE_THREAD.join()
 
     # 로그인
     def login(self):
