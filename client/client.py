@@ -161,29 +161,27 @@ class Client:
     #  if cmd == 3 :
     #    msg : {id:"",pw:""}
     # }
-    def send_message(self):
-        print()
-        while self.ACTIVE:
-            try:
-                message = input(f"{self.USERNAME}: ")
-                if message == "/quit":
-                    self.ACTIVE = False
-                else:
-                    # msg to json
-                    ## cmd = 1
-                    send_packet = None
-                    if(message.startswith('/')):
-                        send_packet = self.dtoj(1, message)
-                    ## cmd = 0
-                    else:
-                        send_packet = self.dtoj(0, message)
-                self.CLIENT.send(bytes(packet_encrypt(send_packet), "utf8"))
-            except:
-                print("Exception Detected!")
+
+    def send_message(self, message):
+        try:
+            send_packet = None
+            if message == "/quit":
                 self.ACTIVE = False
-                self.CLIENT.send(bytes(packet_encrypt("/quit")))
-                import os
-                os._exit(13)
+            else:
+                # msg to json
+                ## cmd = 1
+                if message.startswith('/'):
+                    send_packet = self.dtoj(1, message)
+                ## cmd = 0
+                else:
+                    send_packet = self.dtoj(0, message)
+            self.CLIENT.send(bytes(packet_encrypt(send_packet), "utf8"))
+        except:
+            print("Exception Detected!")
+            self.ACTIVE = False
+            self.CLIENT.send(bytes(packet_encrypt("/quit")))
+            import os
+            os._exit(13)
     
     def receive_message(self):
         try:
