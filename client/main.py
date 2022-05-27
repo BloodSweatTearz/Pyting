@@ -51,7 +51,7 @@ class login_class(QMainWindow, loginForm):
     def login_event(self):
         id = self.id.text()
         pw = self.pw.text()
-        if (id is "") or (pw is ""):
+        if (id == "") or (pw == ""):
             QMessageBox.about(self, "error", 'plz input id pw :(')
             return
 
