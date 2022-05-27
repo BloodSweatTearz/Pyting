@@ -17,7 +17,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
 
     enable_cmd_tooltip = False
 
-    def __init__(self):
+    def __init__(self, Client):
         super(lobby_window, self).__init__()
         self.setupUi(self)
         self.show()
@@ -43,6 +43,8 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         #Refresh는 이미지라 Clicked지원 안해서 이렇게 매핑
         self.refreshImg.mousePressEvent = functools.partial(self.refreshRoomList)
         self.chatEdit.textChanged.connect(self.commandHelper)
+
+        self.CLIENT = Client
 
     def create_dummy(self):
         item = QListWidgetItem('안녕')
