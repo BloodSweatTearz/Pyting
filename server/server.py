@@ -197,14 +197,14 @@ class Server:
                     self.send_to_client(c=c, msg=True, flag=0)
                 else:
                     self.send_to_client(c=c, msg=False, flag=0)    
-                continue
+                return
             if(recv_cmd == 3): # register
                 if(self.add_user(recv_packet['msg']['id'], recv_packet['msg']['pw'])):
                     self.send_to_client(c=c, msg=True, flag=0)
                 else:
                     self.send_to_client(c=c, msg=False, flag=0)    
                     self.ACTIVE = False
-                continue
+                return
             
             
             message = c.recv(self.RECV_SIZE).decode("utf8")
