@@ -108,23 +108,6 @@ class Server:
             print(f" * {address[0]}:{address[1]} has connected.")
             client_t = Thread(target=self.client_thread, args=(client, ))
             client_t.start()
-            
-            '''
-            login_info = client.recv(self.RECV_SIZE).decode("utf8")
-            login_info = packet_decrypt(login_info)
-            login_info = js.loads(login_info)
-
-            # 추후에 recv 값의 cmd를 보고 작동하도록 변경해야함
-            # 현재는 login이 작동하도록 만듦.
-            # 지금은 여기다 만들어서 connect 완료시 매끄럽지 않게 되는데, client_tread에다가 완성시키면 깔끔하게 나올듯.
-            if self.user_login_check(login_info):
-                self.send_to_client(c=client, msg=True, flag=0)
-                Thread(target=self.client_thread, args=(client, )).start()
-                Thread(target=self.receive_command, args=(client, )).start()
-            else:
-                print("user login error: can't create thread")
-                self.send_to_client(c=client, msg=False, flag=0)
-            '''
 
     """
      flag:
@@ -133,8 +116,8 @@ class Server:
       2 = send_user (chan needed)
     """
     def send_to_client(self, chan='', msg='', flag=0, c=[], username=''):
-        print(msg)
-        print(rooms)
+        print("DEBUG_send_to_client1 : ",msg)
+        print("DEBUG_send_to_client2 : ",rooms)
         if flag == 0:
             c.send(packet_encrypt(js.dumps({"rooms": rooms, "msg": msg})).encode(encoding="utf-8"))
         elif flag == 1:
@@ -172,10 +155,6 @@ class Server:
     def client_thread(self, c):
         if(not self.ACTIVE):
             return
-        '''
-        if(not self.list[idx]['recvcmd'].is_alive()):
-            return
-        '''
         recv_packet = c.recv(self.RECV_SIZE).decode("utf8")
         recv_packet = packet_decrypt(recv_packet)
         recv_packet = js.loads(recv_packet)
@@ -205,7 +184,7 @@ class Server:
                 self.send_to_client(c=c, msg=True, flag=0)
             else:
                 self.send_to_client(c=c, msg=False, flag=0)    
-                self.ACTIVE = False
+                #self.ACTIVE = False
             return
             
 
@@ -234,7 +213,7 @@ class Server:
                 if len(message.split(' ')) > 1:
                     (user, text) = message.split(' ', 1)
                     text = private_string + text
-                    print(text)
+                    print("DEBUG2:",text)
                     self.send_to_client(chan, text, flag=2, username=user[1:])
             elif message.startswith("/"):
                 if len(message.split(' ')) > 1:

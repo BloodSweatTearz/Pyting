@@ -13,7 +13,7 @@ class signup_window(QDialog, QWidget, signupForm):
         fix_window_size(self, 175, 175)
 
         self.registerBtn.clicked.connect(self.register)
-
+        
     def register(self):
         username = self.id_4.text()
         pw = self.pw.text()
@@ -24,7 +24,9 @@ class signup_window(QDialog, QWidget, signupForm):
             print("DEBUG register : ",is_success)
             if(is_success):
                 QMessageBox.about(self, "Register", 'Register Success!')    
-                return True                
+                self.CLIENT.reconnect()
+                return                
         QMessageBox.about(self, "Register", 'Register Failed :(')
-        return False
+        self.CLIENT.reconnect()
+        return
 
