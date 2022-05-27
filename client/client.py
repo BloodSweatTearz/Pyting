@@ -79,17 +79,29 @@ class Client:
     def login_test(self):
         self.USERNAME = "pang"
         self.PASSWORD = "1234"
-        
+
+
+    def make_chatting_room(self, room_name):
+        print("[make_chatting_room] called")
+        info = {"name": room_name, "username": self.USERNAME}
+        send_packet = self.dtoj(Cmd.MakeRoom, info)
+        print(" send_packet ", send_packet)
+        a = self.CLIENT.send(packet_encrypt(send_packet).encode(encoding='utf-8'))
+        print(a)
+
 
     # 로그인 체크
     def login_check(self, username, password):
         # send info
         info = {"id":username, "pw":password}
-        send_packet = self.dtoj(2, info) # 주의! info는 딕셔너리임. "msg":info
+        send_packet = self.dtoj(Cmd.Login, info) # 주의! info는 딕셔너리임. "msg":info
         self.CLIENT.send(packet_encrypt(send_packet).encode(encoding='utf-8'))
 
         # recv result
         info_result = self.receive_message()
+        self.CURRENT_ROOM = info_result["rooms"]["general"]["id"]
+
+        #todo : draw member by info_result["rooms"]["general"]["members"] dict
         print("WHAT????:",info_result)
 
         if(info_result['msg'] == True): # msg가 참이면 로그인 성공

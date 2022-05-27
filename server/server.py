@@ -36,6 +36,7 @@ class Server:
         self.LOCK = Lock() # add_user
 
         self.USERS = {}
+        self.rooms = {"general": {"id": str(uuid1()), "members": []}}
 
         self.USER_INFO_FILENAME = './user_info.json'
 
@@ -109,6 +110,22 @@ class Server:
             print(f" * {address[0]}:{address[1]} has connected.")
             client_t = Thread(target=self.client_thread, args=(client, ))
             client_t.start()
+            client_t.join(1000)
+
+    def make_chatting_room(self, name):
+        if name != "":
+            #todo: 방 이름 중복검사 로직 추가해야댐 - 성훈
+            new_room = {name: {"id": str(uuid1()), "members": []}}
+            self.rooms.update(new_room)
+            self.send_to_client(ADMIN_PERM, msg= "make rooms : " + name, flag=1, username="ADMIN")
+            print("[make_chatting_room] Chatting Room created : ", new_room)
+        else:
+            print("[make_chatting_room] Chatting Room name is empty.")
+
+    def list_chatting_room(self):
+        print("[list_chatting_room] return ", rooms.keys())
+        return rooms.keys()
+
 
     """
      flag:
@@ -125,6 +142,9 @@ class Server:
             self.send_all(js.dumps({"rooms": rooms, "username" : username, "msg": msg}), chan)
         elif flag == 2:
             self.send_user(js.dumps({"rooms": rooms,"username" : username, "msg": msg}), username, chan)
+        elif flag == 3: #makeRoom Alert
+            self.send_all(msg, chan)
+
         else:
             pass
 
@@ -292,7 +312,14 @@ class Server:
                 else:
                     print("\nNo one connected to this server..\n")
             elif command.startswith("/rooms"):
-                print(rooms)
+                print(self.rooms)
+            elif command.startswith("/make"):
+                print("make room~")
+                if comment[1] != None:
+                    self.make_chatting_room(comment[1])
+                    print("room list : ", self.list_chatting_room())
+                else:
+                    print("input Parameter!!!!")
             elif command.startswith('/') or command.startswith("/help"):
                 print("\nAvailable Commands: say, kick, shutdown, users\n")
             elif command == '':
