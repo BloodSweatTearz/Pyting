@@ -6,6 +6,9 @@ from PyQt5.QtWidgets import QWidget, QDialog, QListWidgetItem
 
 from ui.pytingUI import lobbyForm, center, fix_window_size
 
+import sys
+sys.path.append("../")
+from cipher import *
 
 class lobby_window(QDialog, QWidget, lobbyForm):
 

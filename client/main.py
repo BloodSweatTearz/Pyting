@@ -70,3 +70,4 @@ if __name__ == "__main__":
 
     window = login_class(CLIENT)
     app.exec_()
+    
