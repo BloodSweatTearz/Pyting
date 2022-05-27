@@ -10,6 +10,7 @@ import sys
 
 sys.path.append("../")
 from cipher import *
+from cmd import Cmd
 
 class Client:
     def __init__(self, IP_ADDRESS="127.0.0.1", PORT=8000, RECV_SIZE=4096):
@@ -102,7 +103,7 @@ class Client:
     def register(self, username, password):
         # send info
         info = {"id":username, "pw":password}
-        send_packet = self.dtoj(3, info) # 주의! info는 딕셔너리임. "msg":info
+        send_packet = self.dtoj(Cmd.Register, info) # 주의! info는 딕셔너리임. "msg":info
         self.CLIENT.send(bytes(packet_encrypt(send_packet), "utf8"))
 
         # recv result
@@ -140,8 +141,11 @@ class Client:
 
     # data to json
     def dtoj(self, cmd, msg):
-        return json.dumps({"username": self.USERNAME, "room_uuid":self.CURRENT_ROOM, "cmd":cmd, "msg":msg})
-        
+        if cmd.value is None:
+            print("[dtoj] Error, cmd value is None")
+            return ""
+        return json.dumps({"username": self.USERNAME, "room_uuid": self.CURRENT_ROOM, "cmd": cmd.value, "msg": msg})
+
     # json to data
     def jtod(self, packet):
         return json.loads(packet)
@@ -164,27 +168,26 @@ class Client:
     # }
 
     def send_message(self, message):
-        try:
-            send_packet = None
-            if message == "/quit":
-                self.ACTIVE = False
-            else:
-                # msg to json
-                ## cmd = 1
-                if message.startswith('/'):
-                    send_packet = self.dtoj(1, message)
-                ## cmd = 0
-                else:
-                    send_packet = self.dtoj(0, message)
-            print(send_packet)
-            self.CLIENT.send(bytes(packet_encrypt(send_packet), "utf8"))
-        except:
-            print("Exception Detected!")
+        if self.CURRENT_ROOM == -1:
+            print("[send_message] Error, WHERE ROOM?")
+            return
+        # try:
+        send_packet = None
+        if message == "/quit":
             self.ACTIVE = False
-            self.CLIENT.send(bytes(packet_encrypt("/quit")))
-            import os
-            os._exit(13)
-    
+        else:
+            if message.startswith('/'):
+                send_packet = self.dtoj(Cmd.Command, message)
+            else:
+                send_packet = self.dtoj(Cmd.Chat, message)
+        self.CLIENT.send(bytes(packet_encrypt(send_packet), "utf8"))
+        # except:
+        #     print("Exception Detected!")
+        #     self.ACTIVE = False
+        #     self.CLIENT.send(bytes(packet_encrypt("/quit")))
+        #     import os
+        #     os._exit(13)
+
     def receive_message(self):
         try:
             message = self.CLIENT.recv(self.RECV_SIZE).decode("utf8")

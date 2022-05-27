@@ -8,6 +8,7 @@ from uuid import *
 
 sys.path.append("../")
 from cipher import *
+from cmd import Cmd
 
 emoticons = js.loads(open("emoticons.json", "r").read())
 #rooms = {"하이": {"id": str(uuid1()), "members": []}}
@@ -172,19 +173,26 @@ class Server:
         private_string = "[" + username + "] "
         welcome_message = f" * You have connected to the server at {self.IP_ADDRESS}."
 
-        if(recv_cmd == 2): # login
+        if recv_cmd == Cmd.Login.value:
             login_success = self.user_login_check(recv_packet)
             if(login_success):
                 self.send_to_client(c=c, username=username, msg=True, flag=0)
             else:
                 self.send_to_client(c=c, username=username, msg=False, flag=0)
-                return
-        if(recv_cmd == 3): # register
-            if(self.add_user(recv_packet['msg']['id'], recv_packet['msg']['pw'])):
+            return
+        elif recv_cmd == Cmd.Register.value:
+            if self.add_user(recv_packet['msg']['id'], recv_packet['msg']['pw']):
                 self.send_to_client(c=c, username=username, msg=True, flag=0)
             else:
                 self.send_to_client(c=c, username=username, msg=False, flag=0)
                 #self.ACTIVE = False
+            return
+        elif recv_cmd == Cmd.MakeRoom.value:
+            print("make_chatting_room : ", recv_packet['room'])
+            self.make_chatting_room(recv_packet['room'])
+            return
+        elif recv_cmd == Cmd.ListRoom.value:
+            self.list_chatting_room()
             return
             
 
