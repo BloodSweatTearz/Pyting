@@ -6,7 +6,7 @@ import time
 import sys
 import signal
 import json
-import sys 
+import sys
 
 sys.path.append("../")
 from cipher import *
@@ -75,8 +75,8 @@ class Client:
     # 로그인(테스트용)
     # 서버에 login 기능이 없기 때문에 만듦
     def login_test(self):
-        self.USERNAME = input("\nEnter username: ")
-        self.PASSWORD = getpass("Enter password: ")
+        self.USERNAME = "pang"
+        self.PASSWORD = "1234"
         
 
     # 로그인 체크
@@ -211,8 +211,8 @@ class Client:
             self.ACTIVE = False
     
     def print_message(self):
-        while(self.ACTIVE):
-            print(self.receive_message()['msg'])    
+        while self.ACTIVE:
+            print("hi ", self.receive_message()['msg'])
 
     def run_client(self):
         self.setup()
@@ -234,8 +234,10 @@ class Client:
 
 # test
 if __name__ == "__main__":
-    print()
     client = Client()
-    # client.login_test()
+    client.login_test()
     client.run_client()
+    client.send_chat("asdasd")
+    client.receive_message()
+
     exit(0)
