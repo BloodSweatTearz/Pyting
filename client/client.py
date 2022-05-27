@@ -54,10 +54,9 @@ class Client:
         signal.signal(signal.SIGINT, self.CLIENT.close)
         signal.signal(signal.SIGABRT, self.CLIENT.close)
 
-    def start_io_loop(self):
+    def start_io_loop(self, lobbyForm):
         if self.ACTIVE:
-            print("[THREAD] print_message()를 쓰레드에 등록합니다.")
-            self.RECEIVE_THREAD = Thread(target=self.print_message)
+            self.RECEIVE_THREAD = Thread(target=self.print_message, args=(lobbyForm, ))
             self.RECEIVE_THREAD.start()
             #self.RECEIVE_THREAD.join()
 
@@ -176,6 +175,7 @@ class Client:
                 ## cmd = 0
                 else:
                     send_packet = self.dtoj(0, message)
+            print(send_packet)
             self.CLIENT.send(bytes(packet_encrypt(send_packet), "utf8"))
         except:
             print("Exception Detected!")
@@ -211,14 +211,14 @@ class Client:
         except OSError:
             self.ACTIVE = False
     
-    def print_message(self):
+    def print_message(self, lobbyForm):
         while self.ACTIVE:
             packet_data = self.receive_message()
             print("recv ", packet_data)
             if packet_data["username"] != self.USERNAME:
                 from PyQt5.QtWidgets import QListWidgetItem
                 item = QListWidgetItem('[{}] {}'.format(packet_data["username"], packet_data["msg"]))
-                self.roomlist.addItem(item)
+                lobbyForm.chatWidget.addItem(item)
 
     def run_client(self):
         self.setup()
