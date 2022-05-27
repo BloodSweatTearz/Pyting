@@ -73,6 +73,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         sysCmd = self.chat_can_command()
         if sysCmd is None:
             #채팅 보내면 됨.
+            self.CLIENT.send_message(self.chatEdit.text())
             self.drawChat("me", self.chatEdit.text())
             self.chatEdit.clear()
             self.chatWidget.scrollToBottom()
