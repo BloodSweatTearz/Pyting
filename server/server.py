@@ -284,6 +284,7 @@ class Server:
     def receive_command(self):
         while self.ACTIVE:
             command = input("[>] ")
+            comment = command.split(' ', 1)
             if command.startswith("/say"):
                 comment = command.split(' ', 1)
                 if len(command.split(' ')) > 1:
