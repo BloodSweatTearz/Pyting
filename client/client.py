@@ -58,6 +58,7 @@ class Client:
         if self.ACTIVE:
             self.RECEIVE_THREAD = Thread(target=self.print_message, args=(lobbyForm, ))
             self.RECEIVE_THREAD.start()
+            print("[THREAD] print_message()를 쓰레드에 등록합니다.")
             #self.RECEIVE_THREAD.join()
 
     # 로그인
