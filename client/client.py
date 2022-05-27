@@ -57,11 +57,8 @@ class Client:
     def start_io_loop(self):
         if self.ACTIVE:
             self.RECEIVE_THREAD = Thread(target=self.print_message)
-            self.SEND_THREAD = Thread(target=self.send_message)
             self.RECEIVE_THREAD.start()
-            self.SEND_THREAD.start()
             self.RECEIVE_THREAD.join()
-            self.SEND_THREAD.join()
 
     # 로그인
     def login(self):
