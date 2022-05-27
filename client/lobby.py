@@ -72,6 +72,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             #채팅 보내면 됨.
             self.drawChat("me", self.chatEdit.text())
             self.chatEdit.clear()
+            self.chatWidget.scrollToBottom()
         elif (sysCmd is not None) and (self.chatEdit.text().find(sysCmd[0]) == 1):
             #채팅이 아니라 명령어 실행
             print("명령어!!")
