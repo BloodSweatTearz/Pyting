@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from socket import AF_INET, socket, SOCK_STREAM
-from threading import Thread
+from threading import Thread, Lock
 import sys
 import signal
 import json as js
@@ -32,6 +32,12 @@ class Server:
         signal.signal(signal.SIGINT, self.close)
         signal.signal(signal.SIGABRT, self.close)
 
+        self.LOCK = Lock() # add_user
+
+        self.USERS = {}
+
+        self.USER_INFO_FILENAME = './user_info.json'
+
     # init 이후에도 설정할 수 있도록 set 함수 추가
     # set port
     def setPort(self, PORT=8000):
@@ -56,19 +62,24 @@ class Server:
         print("Close Server...")
         self.SERVER.close()
 
+    def load_users(self):
+        try:
+            self.USERS = js.loads(open(self.USER_INFO_FILENAME, 'r').read())
+        except:
+            self.USERS = {}
+            open(self.USER_INFO_FILENAME, 'w').write(js.dumps(self.USERS))
+
     # login check
     def user_login_check(self, user_info):
         user_id = user_info['msg']['id']
         user_pw = user_info['msg']['pw']
-
+        print("DEBUG1 : ",user_id, user_pw)
         try:
-            if users[user_id] == user_pw:
+            if self.USERS[user_id] == user_pw:
                 return True
-            else:
-                return False
-        except:
-            print("login error")
-            return False
+        except Exception as e:
+            print("login error:", e)
+        return False
 
     # 서버 바인딩
     def setup(self):
@@ -89,11 +100,15 @@ class Server:
         self.SERVER.listen(self.MAX_CLIENTS)
         print(f"Currently listening for up to {self.MAX_CLIENTS} clients...\n")
         while self.ACTIVE:
+            self.load_users()
             (client, address) = self.SERVER.accept()
             if(not self.ACTIVE):
                 return
             print(f" * {address[0]}:{address[1]} has connected.")
+            Thread(target=self.client_thread, args=(client, )).start()
+            Thread(target=self.receive_command, args=(client, )).start()
 
+            '''
             login_info = client.recv(self.RECV_SIZE).decode("utf8")
             login_info = packet_decrypt(login_info)
             login_info = js.loads(login_info)
@@ -108,6 +123,7 @@ class Server:
             else:
                 print("user login error: can't create thread")
                 self.send_to_client(c=client, msg=False, flag=0)
+            '''
 
     """
      flag:
@@ -130,7 +146,26 @@ class Server:
     def message_format(self, username, text=""):
         return { 'username': username, 'text': text }
 
+    # password는 아직은 평문
+    def add_user(self, username, password): # register
+        
+        user_info = {}
+        self.LOCK.acquire() # Race Condition 방지
+        # load
+        with open(self.USER_INFO_FILENAME, 'r') as fp:
+            user_info = js.loads(fp.read())
+        user_info[username] = password
+        # save
+        with open(self.USER_INFO_FILENAME, 'w') as fp:
+            fp.write(js.dumps(user_info))
+
+        print(f"[O] Register Success : {username}, {password}")
+        self.LOCK.release()
+        return True
+
     def client_thread(self, c):
+        if(not self.ACTIVE):
+            return
         recv_packet = c.recv(self.RECV_SIZE).decode("utf8")
         recv_packet = packet_decrypt(recv_packet)
         recv_packet = js.loads(recv_packet)
@@ -139,17 +174,39 @@ class Server:
         username = recv_packet['username']
         self.CLIENT_LIST[c] = username
 
+        recv_cmd = recv_packet['cmd']
+        print("DEBUG recv_cmd : ",recv_cmd)
+        
         rooms["general"]["members"].append(username)
 
         user_string = "<" + username + "> "
         private_string = "[" + username + "] "
         welcome_message = f" * You have connected to the server at {self.IP_ADDRESS}."
 
+        ## legacy code
         # flag가 0인 경우, 사실 그냥 welcome_message만 보내도 됨.
-        self.send_to_client(c=c, msg=welcome_message, flag=0)
-        join_message = f" * {username} has joined the server."
-        self.send_to_client(chan, join_message, flag=1)
+        # self.send_to_client(c=c, msg=welcome_message, flag=0)
+        # join_message = f" * {username} has joined the server."
+        # self.send_to_client(chan, join_message, flag=1)
         while self.ACTIVE:
+            if(not self.ACTIVE):
+                return
+            if(recv_cmd == 2): # login
+                login_success = self.user_login_check(recv_packet)
+                if(login_success):
+                    self.send_to_client(c=c, msg=True, flag=0)
+                else:
+                    self.send_to_client(c=c, msg=False, flag=0)    
+                continue
+            if(recv_cmd == 3): # register
+                if(self.add_user(recv_packet['msg']['id'], recv_packet['msg']['pw'])):
+                    self.send_to_client(c=c, msg=True, flag=0)
+                else:
+                    self.send_to_client(c=c, msg=False, flag=0)    
+                    self.ACTIVE = False
+                continue
+            
+            
             message = c.recv(self.RECV_SIZE).decode("utf8")
             message = packet_decrypt(message)
             pkt = js.loads(message)

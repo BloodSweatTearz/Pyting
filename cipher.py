@@ -1,11 +1,13 @@
 import base64
 import hashlib
 from Crypto.Cipher import AES
+import json
 
 key = "pangishandsome"
 BS = 16
 pad = (lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS).encode())
 unpad = (lambda s: s[:-ord(s[len(s)-1:])])
+
 
 class AESCipher(object):
     def __init__(self, key):
@@ -22,7 +24,11 @@ class AESCipher(object):
         enc = base64.b64decode(enc)
         cipher = AES.new(self.key, AES.MODE_CBC, self.__iv().encode('utf-8'))
         dec = cipher.decrypt(enc)
-        return unpad(dec).decode('utf-8')
+        try:
+            return unpad(dec).decode('utf-8')
+        except:
+            error = {"msg":"Decrypt Error!"}
+            return json.dumps(error)
 
     def __iv(self):
         return chr(0) * 16

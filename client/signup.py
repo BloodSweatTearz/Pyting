@@ -15,14 +15,16 @@ class signup_window(QDialog, QWidget, signupForm):
         self.registerBtn.clicked.connect(self.register)
 
     def register(self):
-        username = self.id_5.text()
+        username = self.id_4.text()
         pw = self.pw.text()
         pw_re = self.pw_re.text()
 
         if(pw == pw_re):
-            if(self.CLIENT.register(username, pw)):
-                QMessageBox.about(self, "error", 'Register Success!')    
+            is_success = self.CLIENT.register(username, pw)
+            print("DEBUG register : ",is_success)
+            if(is_success):
+                QMessageBox.about(self, "Register", 'Register Success!')    
                 return True                
-        QMessageBox.about(self, "error", 'Register Failed :(')
+        QMessageBox.about(self, "Register", 'Register Failed :(')
         return False
 

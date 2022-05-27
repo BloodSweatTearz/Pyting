@@ -58,6 +58,7 @@ class login_class(QMainWindow, loginForm):
             self.lobby_window.exec()
         else:
             QMessageBox.about(self, "error", 'login Failed :(')
+            self.CLIENT.reconnect()
 
 if __name__ == "__main__":
     SERVER_IP = "localhost"
@@ -70,4 +71,3 @@ if __name__ == "__main__":
 
     window = login_class(CLIENT)
     app.exec_()
-    

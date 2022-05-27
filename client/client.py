@@ -91,9 +91,9 @@ class Client:
 
         # recv result
         info_result = self.receive_message()
-        print(info_result)
+        print("WHAT????:",info_result)
 
-        if(info_result['msg']): # msg가 참이면 로그인 성공
+        if(info_result['msg'] == True): # msg가 참이면 로그인 성공
             return True
         return False
         # return info_result['msg']
@@ -107,7 +107,7 @@ class Client:
 
         # recv result
         info_result = self.receive_message()
-        if(info_result['msg']): # msg가 참이면 회원가입 성공
+        if(info_result['msg'] == True): # msg가 참이면 회원가입 성공
             print("[O] Register Success!")
             return True
         return False
@@ -191,6 +191,8 @@ class Client:
             message = self.CLIENT.recv(self.RECV_SIZE).decode("utf8")
             message = packet_decrypt(message)
             message = self.jtod(message) # 받은 json을 data로 변경
+            if(message["msg"] == "Decrypt Error!"):
+                return message
             '''
                 {
                     "rooms":{
@@ -222,6 +224,17 @@ class Client:
             self.CLIENT.close()
         self.CLIENT.close()
     
+    def reconnect(self):
+        self.CLIENT.close()
+        ip_address = self.IP_ADDRESS
+        port = self.PORT
+        recv_size = self.RECV_SIZE
+        self.__init__(IP_ADDRESS=ip_address, PORT=port, RECV_SIZE=recv_size)
+        self.setup()
+
+    def disconnect(self):
+        self.CLIENT.close()
+
 # test
 if __name__ == "__main__":
     print()
