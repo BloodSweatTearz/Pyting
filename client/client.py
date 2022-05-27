@@ -2,11 +2,14 @@
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 from getpass import getpass
-from cipher import *
 import time
 import sys
 import signal
 import json
+import sys 
+
+sys.path.append("../")
+from cipher import *
 
 class Client:
     def __init__(self, IP_ADDRESS="127.0.0.1", PORT=8000, RECV_SIZE=4096):

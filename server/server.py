@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
-from cipher import *
 import sys
 import signal
 import json as js
 from uuid import *
+
+sys.path.append("../")
+from cipher import *
 
 emoticons = js.loads(open("emoticons.json", "r").read())
 #rooms = {"하이": {"id": str(uuid1()), "members": []}}
