@@ -48,6 +48,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         self.chatEdit.textChanged.connect(self.commandHelper)
 
         self.CLIENT = Client
+        self.CLIENT.start_io_loop()
 
     def create_dummy(self):
         item = QListWidgetItem('안녕')
