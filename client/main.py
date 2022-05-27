@@ -49,8 +49,13 @@ class login_class(QMainWindow, loginForm):
         self.show()
 
     def login_event(self):
-        #is_success = True #todo: 로그인 로직 구현 - done
-        is_success = CLIENT.login_check(self.id.text(), self.pw.text())
+        id = self.id.text()
+        pw = self.pw.text()
+        if id is "" or pw is "" :
+            QMessageBox.about(self, "error", 'plz input id pw :(')
+            return
+
+        is_success = CLIENT.login_check(id, pw)
         debug_print(is_success)
         if is_success:
             self.hide()
