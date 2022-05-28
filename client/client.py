@@ -60,7 +60,6 @@ class Client:
         if self.ACTIVE:
             self.RECEIVE_THREAD = Thread(target=self.print_message, args=(lobbyForm, ))
             self.RECEIVE_THREAD.start()
-            print("[THREAD] print_message()를 쓰레드에 등록합니다.")
             #self.RECEIVE_THREAD.join()
 
     # 로그인 체크
@@ -77,7 +76,6 @@ class Client:
         self.CURRENT_ROOM = self.DEFAULT_CHANNEL_NAME
 
         #todo : draw member by info_result["rooms"]["general"]["members"] dict
-        print("WHAT????:",info_result)
 
         if(info_result['msg'] == True): # msg가 참이면 로그인 성공
             self.USERNAME = username
@@ -125,8 +123,6 @@ class Client:
         # if(recv_packet['rooms']["current_room_uuid"] != -1):
         #     self.USERLIST = recv_packet["members"]
         if(self.CURRENT_ROOM != -1):
-            print(type(recv_packet))
-            print(recv_packet)
             self.USERLIST = recv_packet['rooms'][self.CURRENT_ROOM]['members']
 
     # data to json
@@ -170,7 +166,6 @@ class Client:
                 send_packet = self.dtoj(Cmd.Command, message)
             else:
                 send_packet = self.dtoj(Cmd.Chat, message)
-        print("spacket", send_packet)
         self.CLIENT.send(bytes(packet_encrypt(send_packet), "utf8"))
         # except:
         #     print("Exception Detected!")
@@ -218,17 +213,13 @@ class Client:
 
     def get_room_list(self):
         res = []
-        print("selfroom", self.ROOMS)
         for room in self.ROOMS.keys():
             res.append(room)
         return res
 
     def print_message(self, lobbyForm):
         while self.ACTIVE:
-            print("print_message1")
             packet_data = self.receive_message()
-            print(packet_data)
-            print("recv ", packet_data)
             # error !!!!!
             if(
                 packet_data == None
@@ -238,20 +229,16 @@ class Client:
                 continue
 
             if("whisper_flag" in packet_data):
-                print("print_message4")
                 from PyQt5.QtWidgets import QListWidgetItem
                 item = QListWidgetItem('<{}->me> {}'.format(packet_data["sender"], packet_data["msg"]))
                 lobbyForm.chatWidget.addItem(item)
-                print("print_message5")
                 lobbyForm.chatWidget.scrollToBottom()
                 continue
 
             if packet_data["username"] != self.USERNAME:
-                print("print_message2")
                 from PyQt5.QtWidgets import QListWidgetItem
                 item = QListWidgetItem('[{}] {}'.format(packet_data["username"], packet_data["msg"]))
                 lobbyForm.chatWidget.addItem(item)
-                print("print_message3")
                 lobbyForm.chatWidget.scrollToBottom()
             lobbyForm.chatWidget.scrollToBottom()
 
