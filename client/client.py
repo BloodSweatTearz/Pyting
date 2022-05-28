@@ -239,6 +239,13 @@ class Client:
         except OSError:
             self.ACTIVE = False
 
+    def get_room_list(self):
+        res = []
+        for room in self.ROOMS.keys():
+            res.append(room)
+        return res
+
+
     def print_message(self, lobbyForm):
         while self.ACTIVE:
             print("print_message1")
