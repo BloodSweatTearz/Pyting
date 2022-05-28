@@ -74,8 +74,11 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             self.roomlist.addItem(room_item)
 
     def connectRoom(self):
-        from PyQt5.QtCore import QModelIndex
-        self.roomlist.setCurrentIndex(QModelIndex())
+        room_name = self.roomlist.currentItem().text()
+        self.chatEdit.setText("/join {}".format(room_name))
+        self.mynamelabel.setText("hi, {}\n you are on channel {}".format(self.CLIENT.USERNAME, room_name))
+        self.sendChat()
+        self.chatEdit.setText("")
 
         self.form_size(1)
         self.roomlist.clearSelection()
