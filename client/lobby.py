@@ -4,12 +4,12 @@ import re
 from PyQt5.QtGui import QPixmap, QColor, QTextCursor
 from PyQt5.QtWidgets import QWidget, QDialog, QListWidgetItem, QMessageBox
 
-from server.server import emoticons
 from ui.pytingUI import lobbyForm, center, fix_window_size
 
 import sys
 sys.path.append("../")
 from cipher import *
+from server.server import emoticons
 
 class lobby_window(QDialog, QWidget, lobbyForm):
 

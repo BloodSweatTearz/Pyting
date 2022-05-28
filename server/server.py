@@ -10,7 +10,7 @@ sys.path.append("../")
 from cipher import *
 from commands import Cmd
 
-emoticons = js.loads(open("emoticons.json", "r").read())
+emoticons = js.loads(open("../server/emoticons.json", "r").read())
 #rooms = {"하이": {"id": str(uuid1()), "members": []}}
 #rooms = {"general": {"id": str(uuid1()), "members": []}}
 users = { "asdf": "1234" , "pang": "1234", "qwer": "1234"}
@@ -247,12 +247,14 @@ class Server:
         elif message.startswith("/whoami"):
             message = message.replace("/whoami", " * " + username, 1)
             self.send_to_client(chan=chan, msg=message, flag=1)
-        elif message.startswith("@"):
+        elif message.startswith("/whisper"): # whispher
+            print('whisper')
             if len(message.split(' ')) > 1:
-                (user, text) = message.split(' ', 1)
-                text = private_string + text
-                print("DEBUG2:",text)
-                self.send_to_client(chan=chan, msg=text, flag=2, username=user[1:])
+                data = message.split(' ')
+                user = data[1]
+                msg = data[2]
+                print("DEBUG2:",msg)
+                self.send_to_client(chan=chan, msg=msg, flag=2, username=user)
         elif message.startswith("/"):
             if len(message.split(' ')) > 1:
                 cmd = message.split(' ', 1)
