@@ -4,6 +4,7 @@ import re
 from PyQt5.QtGui import QPixmap, QColor, QTextCursor
 from PyQt5.QtWidgets import QWidget, QDialog, QListWidgetItem, QMessageBox
 
+from server.server import emoticons
 from ui.pytingUI import lobbyForm, center, fix_window_size
 
 import sys
@@ -87,8 +88,11 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         sysCmd = self.chat_can_command()
         if sysCmd is None:
             #채팅 보내면 됨.
-            self.CLIENT.send_message(self.chatEdit.text())
-            self.drawChat("me", self.chatEdit.text())
+            message = self.chatEdit.text()
+            self.CLIENT.send_message(message)
+            for name in emoticons.keys():
+                message = message.replace(name, emoticons[name])
+            self.drawChat("me", message)
         elif (sysCmd is not None) and (self.chatEdit.text().find(sysCmd[0]) == 1):
             #채팅이 아니라 명령어 실행
             print("명령어!!")
