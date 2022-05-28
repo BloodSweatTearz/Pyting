@@ -186,10 +186,8 @@ class Server:
         recv_cmd = recv_packet['cmd']
         print("DEBUG recv_cmd : ",recv_cmd)
 
-        user_string = "<" + username + "> "
         private_string = "[" + username + "] "
-        welcome_message = f" * You have connected to the server at {self.IP_ADDRESS}."
-
+        
         if recv_cmd == Cmd.Login.value:
             login_success = self.user_login_check(recv_packet)
             if(login_success):
@@ -308,6 +306,8 @@ class Server:
 
             if recv_cmd == Cmd.Chat.value:
                 print("DEBUG_client_thread msg")
+                if message == '':
+                    continue
                 for name in emoticons.keys():
                     message = message.replace(name, emoticons[name])
                 self.send_to_client(chan, username=username, msg=message, flag=1)
