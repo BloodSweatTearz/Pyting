@@ -64,7 +64,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         self.connectRoom()
         self.chatWidget.scrollToBottom()
 
-    def refreshRoomList(self, event):
+    def refreshRoomList(self):
         self.roomlist.clear()
         res = self.CLIENT.get_room_list()
         from PyQt5.QtWidgets import QListWidgetItem
