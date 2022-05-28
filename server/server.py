@@ -5,6 +5,7 @@ import sys
 import signal
 import json as js
 from uuid import *
+import random as rd
 
 sys.path.append("../")
 from cipher import *
@@ -15,6 +16,18 @@ emoticons = js.loads(open("../server/emoticons.json", "r").read())
 #rooms = {"general": {"id": str(uuid1()), "members": []}}
 users = { "asdf": "1234" , "pang": "1234", "qwer": "1234"}
 ADMIN_PERM = True
+welcome_msgs = [
+    " 채널 문을 박차고 들어오셨습니다.",
+    " 우주에서 떨어져 채널에 입성하셨습니다.",
+    " 으로 착륙하셨어요.",
+    " 31337번째 멀티버스에서 도착하셨습니다.",
+    " 공대 9425에서 입장하셨습니다.",
+    " 채널에 밥먹으러 왔습니다.",
+    " 채널에 자러왔습니다.",
+    " 채널에 놀러왔습니다.",
+    " 누추한 채널에 도착하셨습니다.",
+    " 귀한 채널에 도착하셨습니다."
+]
 
 class Server:
     def __init__(self, IP_ADDRESS="127.0.0.1", PORT=8000, MAX_CLIENTS=100, RECV_SIZE=4096):
@@ -112,19 +125,14 @@ class Server:
             client_t.start()
             #client_t.join(1000)
 
-    def make_chatting_room(self, name):
+    def make_chat_room(self, name):
         if name != "":
             #todo: 방 이름 중복검사 로직 추가해야댐 - 성훈
             new_room = {name: {"id": str(uuid1()), "members": []}}
             self.rooms.update(new_room)
-            print("DEBUG_make_chatting_room : ",name)
             self.send_to_client(chan=ADMIN_PERM, msg= "make rooms : " + name, flag=1, username="ADMIN")
-            print("[make_chatting_room] Chatting Room created : ", new_room)
-        else:
-            print("[make_chatting_room] Chatting Room name is empty.")
 
-    def list_chatting_room(self):
-        print("[list_chatting_room] return ", self.rooms.keys())
+    def list_chat_room(self):
         return self.rooms.keys()
 
 
@@ -133,6 +141,7 @@ class Server:
       0 = c.send
       1 = send_all (chan needed)
       2 = send_user (chan needed)
+      3 = whisper_flag used (chan needed)
     """
     def send_to_client(self, chan=None, msg='', flag=0, c=[], username=''):
         print("DEBUG_send_to_client1 : ",msg)
@@ -153,9 +162,7 @@ class Server:
 
     # password는 아직은 평문
     def add_user(self, username, password): # register
-
         username = username.replace(' ', '_')
-
         user_info = {}
         self.LOCK.acquire() # Race Condition 방지
         if(username in self.USERS.keys()):
@@ -178,13 +185,10 @@ class Server:
     def client_thread(self, c):
         username = 'None'
         chan = {"name": "general", "id": self.rooms['general']['id']}
-        print("chan check: ", chan)
-        print("rooms check", self.rooms)
         while self.ACTIVE:
             recv_packet = c.recv(self.RECV_SIZE).decode("utf8")
             recv_packet = packet_decrypt(recv_packet)
             recv_packet = js.loads(recv_packet)
-            print("recv_packet:" ,recv_packet) # test
             message = recv_packet['msg']
             if message == "Decrypt Error!":
                 print("Error in client_thread():", message)
@@ -205,25 +209,19 @@ class Server:
             print(private_string)
 
             if recv_cmd == Cmd.Chat.value:
-                print("DEBUG_client_thread msg")
                 if message == '':
                     continue
                 for name in emoticons.keys():
                     message = message.replace(name, emoticons[name])
-                print("님 채널 여기임: ", chan)
-                print("rooms는 이거임:", self.rooms)
                 self.send_to_client(chan=chan, username=username, msg=message, flag=1)
             elif recv_cmd == Cmd.Command.value:
-                print("CHAN TEST1 : ", chan)
                 is_success, chan = self.command_handler(message=message, username=username, private_string=private_string, c=c, chan=chan)
                 if(is_success):
                     break
-                print("CHAN TEST2 : ", chan)
                 continue
             elif recv_cmd == Cmd.Login.value:
                 login_success = self.user_login_check(recv_packet)
                 if(login_success):
-                    print("USERNAME : ",username)
                     self.send_to_client(c=c, username=username, msg=True, flag=0)
                 else:
                     self.send_to_client(c=c, username=username, msg=False, flag=0)
@@ -235,11 +233,10 @@ class Server:
                     self.send_to_client(c=c, username=username, msg=False, flag=0)
                 break
             elif recv_cmd == Cmd.MakeRoom.value:
-                print("make_chatting_room : ", recv_packet['room'])
-                self.make_chatting_room(recv_packet['room'])
+                self.make_chat_room(recv_packet['room'])
                 break
             elif recv_cmd == Cmd.ListRoom.value:
-                self.list_chatting_room()
+                self.list_chat_room()
                 break
 
     def command_handler(self, message='', username='', private_string='', c=None, chan=None):
@@ -260,9 +257,6 @@ class Server:
                 data = message.split(' ', 2)
                 user = data[1]
                 msg = data[2]
-                print("DEBUG2:",msg)
-                print("### user: ", user)
-                print("+++ username: ", username)
                 self.send_to_client(chan=chan, msg=msg, flag=3, username={"receiver": user, "sender": username})
         elif message.startswith("/"):
             if len(message.split(' ')) > 1:
@@ -297,7 +291,7 @@ class Server:
                         print('username:', username)
                         print('channame',chan['name'])
                         chan = {"name": cmd[1], "id": self.rooms[cmd[1]]['id']}
-                        self.send_to_client(chan=chan, msg=f"[*] {username}님 " + cmd[1] + " 채널 들어오셨음", flag=1)
+                        self.send_to_client(chan=chan, msg=f"[*] {username}님이 " + cmd[1] + welcome_msgs[rd.randrange(255) % len(welcome_msgs)], flag=1)
                     except Exception as e:
                         print("HEERERE : ",e)
                         return False, chan # continue
@@ -340,8 +334,8 @@ class Server:
             elif command.startswith("/make"):
                 print("make room~")
                 if comment[1] != None:
-                    self.make_chatting_room(comment[1])
-                    print("room list : ", self.list_chatting_room())
+                    self.make_chat_room(comment[1])
+                    print("room list : ", self.list_chat_room())
                 else:
                     print("input Parameter!!!!")
             elif command.startswith('/') or command.startswith("/help"):
@@ -373,17 +367,13 @@ class Server:
                     c.send(packet_encrypt(m).encode(encoding="utf-8"))
                 continue
             user = self.CLIENT_LIST[c]
-            print("send_user user :",user, u['receiver'])
-            print("send_user2 : ", self.rooms[chan['name']]['members'])
             if user in self.rooms[chan['name']]['members']:
                 if user == u['receiver']:
-                    print("you caught this")
                     c.send(packet_encrypt(m).encode(encoding="utf-8"))
                     print('user',user)
                     print('u',u)
                     print('m',m)
 
-# TEST
 if __name__ == "__main__":
     if(len(sys.argv) > 1):
         server_c = Server(PORT=sys.argv[1])

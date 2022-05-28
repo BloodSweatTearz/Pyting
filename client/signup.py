@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox
+from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox, QLineEdit
 
 from ui.pytingUI import signupForm, center, fix_window_size
 

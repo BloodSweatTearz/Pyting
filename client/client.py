@@ -2,9 +2,9 @@
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 from getpass import getpass
-import time
-import sys
+import hashlib
 import signal
+import time
 import json
 import sys
 
@@ -63,26 +63,9 @@ class Client:
             print("[THREAD] print_message()를 쓰레드에 등록합니다.")
             #self.RECEIVE_THREAD.join()
 
-    # 로그인
-    def login(self):
-        username = input("\nEnter username: ")
-        password = getpass("Enter password: ")
-        if(self.login_check(username, password)): # 참이면 로그인 정보 확인(성공)
-            self.USERNAME = username
-            self.PASSWORD = password
-            return True
-        else: # 로그인 실패
-            print("[!] USER INFO HAS NONE. PLZ REGISETER FIRST.")
-            return False
-
-    # 로그인(테스트용)
-    # 서버에 login 기능이 없기 때문에 만듦
-    def login_test(self):
-        self.USERNAME = "pang"
-        self.PASSWORD = "1234"
-
     # 로그인 체크
     def login_check(self, username, password):
+        password = hashlib.sha512(password.encode()).hexdigest()
         # send info
         info = {"id":username, "pw":password}
         send_packet = self.dtoj(Cmd.Login, info) # 주의! info는 딕셔너리임. "msg":info
@@ -105,6 +88,7 @@ class Client:
 
     # 회원가입
     def register(self, username, password):
+        password = hashlib.sha512(password.encode()).hexdigest()
         # send info
         info = {"id":username, "pw":password}
         send_packet = self.dtoj(Cmd.Register, info) # 주의! info는 딕셔너리임. "msg":info
@@ -259,6 +243,7 @@ class Client:
                 item = QListWidgetItem('<{}->me> {}'.format(packet_data["sender"], packet_data["msg"]))
                 lobbyForm.chatWidget.addItem(item)
                 print("print_message5")
+                lobbyForm.chatWidget.scrollToBottom()
                 continue
 
             if packet_data["username"] != self.USERNAME:
@@ -267,6 +252,7 @@ class Client:
                 item = QListWidgetItem('[{}] {}'.format(packet_data["username"], packet_data["msg"]))
                 lobbyForm.chatWidget.addItem(item)
                 print("print_message3")
+                lobbyForm.chatWidget.scrollToBottom()
             lobbyForm.chatWidget.scrollToBottom()
 
     def run_client(self):
