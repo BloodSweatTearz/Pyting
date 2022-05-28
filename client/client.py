@@ -186,6 +186,7 @@ class Client:
                 send_packet = self.dtoj(Cmd.Command, message)
             else:
                 send_packet = self.dtoj(Cmd.Chat, message)
+        print("spacket", send_packet)
         self.CLIENT.send(bytes(packet_encrypt(send_packet), "utf8"))
         # except:
         #     print("Exception Detected!")
@@ -253,13 +254,13 @@ class Client:
                 continue
 
             if("whisper_flag" in packet_data):
-                if(packet_data["whisper_flag"]):
-                    print("print_message4")
-                    from PyQt5.QtWidgets import QListWidgetItem
-                    item = QListWidgetItem('<{}> {}'.format(packet_data["username"], packet_data["msg"]))
-                    lobbyForm.chatWidget.addItem(item)
-                    print("print_message5")
-                    continue
+                print('sibal'*1000)
+                print("print_message4")
+                from PyQt5.QtWidgets import QListWidgetItem
+                item = QListWidgetItem('<{}->me> {}'.format(packet_data["sender"], packet_data["msg"]))
+                lobbyForm.chatWidget.addItem(item)
+                print("print_message5")
+                continue
 
             if packet_data["username"] != self.USERNAME:
                 print("print_message2")

@@ -144,7 +144,7 @@ class Server:
         elif flag == 2:
             self.send_user(js.dumps({"rooms": self.rooms,"username" : username, "msg": msg}), username, chan)
         elif flag == 3:
-            self.send_user(js.dumps({"rooms": self.rooms,"username" : username, "msg": msg, "whisper_flag":True}), username, chan)
+            self.send_user(js.dumps({"rooms": self.rooms,"username" : username["receiver"], "msg": msg, "whisper_flag":True, "sender":username["sender"]}), username, chan)
         else:
             pass
 
@@ -177,7 +177,9 @@ class Server:
 
     def client_thread(self, c):
         username = 'None'
-        chan = {"name": "general", "id": str(uuid1())}
+        chan = {"name": "general", "id": self.rooms['general']['id']}
+        print("chan check: ", chan)
+        print("rooms check", self.rooms)
         while self.ACTIVE:
             recv_packet = c.recv(self.RECV_SIZE).decode("utf8")
             recv_packet = packet_decrypt(recv_packet)
@@ -208,6 +210,8 @@ class Server:
                     continue
                 for name in emoticons.keys():
                     message = message.replace(name, emoticons[name])
+                print("님 채널 여기임: ", chan)
+                print("rooms는 이거임:", self.rooms)
                 self.send_to_client(chan=chan, username=username, msg=message, flag=1)
             elif recv_cmd == Cmd.Command.value:
                 print("CHAN TEST1 : ", chan)
@@ -258,7 +262,9 @@ class Server:
                 user = data[1]
                 msg = data[2]
                 print("DEBUG2:",msg)
-                self.send_to_client(chan=chan, msg=msg, flag=3, username=user)
+                print("### user: ", user)
+                print("+++ username: ", username)
+                self.send_to_client(chan=chan, msg=msg, flag=3, username={"receiver": user, "sender": username})
         elif message.startswith("/"):
             if len(message.split(' ')) > 1:
                 cmd = message.split(' ', 1)

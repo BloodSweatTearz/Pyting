@@ -95,6 +95,8 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         if sysCmd is None:
             #채팅 보내면 됨.
             message = self.chatEdit.text()
+            if message == '':
+                return
             self.CLIENT.send_message(message)
             for name in emoticons.keys():
                 message = message.replace(name, emoticons[name])
