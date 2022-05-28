@@ -81,14 +81,6 @@ class Client:
         self.USERNAME = "pang"
         self.PASSWORD = "1234"
 
-    def make_chatting_room(self, room_name):
-        print("[make_chatting_room] called")
-        info = {"name": room_name, "username": self.USERNAME}
-        send_packet = self.dtoj(Cmd.MakeRoom, info)
-        print(" send_packet ", send_packet)
-        a = self.CLIENT.send(packet_encrypt(send_packet).encode(encoding='utf-8'))
-        print(a)
-
     # 로그인 체크
     def login_check(self, username, password):
         # send info
@@ -241,10 +233,10 @@ class Client:
 
     def get_room_list(self):
         res = []
+        print("selfroom", self.ROOMS)
         for room in self.ROOMS.keys():
             res.append(room)
         return res
-
 
     def print_message(self, lobbyForm):
         while self.ACTIVE:
@@ -256,7 +248,7 @@ class Client:
             if(
                 packet_data == None
                 or
-                packet_data['msg'] == "Decrypt Error!"                
+                packet_data['msg'] == "Decrypt Error!"
             ):
                 continue
 
@@ -290,7 +282,5 @@ if __name__ == "__main__":
     client = Client()
     client.login_test()
     client.run_client()
-    client.send_chat("asdasd")
     client.receive_message()
-
     exit(0)
