@@ -374,10 +374,10 @@ class Server:
                     c.send(packet_encrypt(m).encode(encoding="utf-8"))
                 continue
             user = self.CLIENT_LIST[c]
-            print("send_user user :",user, u)
+            print("send_user user :",user, u['receiver'])
             print("send_user2 : ", self.rooms[chan['name']]['members'])
             if user in self.rooms[chan['name']]['members']:
-                if user == u:
+                if user == u['receiver']:
                     print("you caught this")
                     c.send(packet_encrypt(m).encode(encoding="utf-8"))
                     print('user',user)
