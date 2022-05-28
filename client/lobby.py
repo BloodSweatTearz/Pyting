@@ -26,7 +26,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         self.show()
         self.form_size(0)
         center(self)
-        self.create_dummy()
+        #self.create_dummy()
 
         #Event Mapping
         self.makeChatEdit.returnPressed.connect(self.makeChat)
