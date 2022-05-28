@@ -169,8 +169,26 @@
       <x>370</x>
       <y>50</y>
       <width>161</width>
-      <height>281</height>
+      <height>301</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="mynamelabel">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>355</y>
+      <width>161</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>hello {nickname}</string>
     </property>
    </widget>
   </widget>
