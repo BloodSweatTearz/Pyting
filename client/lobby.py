@@ -16,7 +16,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
     cmd = [ # command, parameter, detail tips
             ["help", "", "you can get some tips."],
             ["join", "room", "you can join room with command."],
-            #["whisper", "nicname", "You can tell users secretly."],
+            ["whisper", "nicname", "You can tell users secretly."],
             ["whoami", "", "who are you? I'll tell you :>"]
     ]
 
@@ -112,6 +112,11 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             elif sysCmd[0] == "whoami":
                 command = QListWidgetItem("----you are {}----".format(self.CLIENT.USERNAME))
                 self.chatWidget.addItem(command)
+            else:
+                self.CLIENT.send_message(self.chatEdit.text())
+
+
+
 
         self.chatEdit.clear()
         self.chatWidget.scrollToBottom()
