@@ -174,7 +174,7 @@ class Server:
         self.LOCK.release()
         return True
 
-    def client_thread(self, c):
+    def client_thread_legacy(self, c):
         if(not self.ACTIVE):
             return
         recv_packet = c.recv(self.RECV_SIZE).decode("utf8")
@@ -205,7 +205,6 @@ class Server:
                 self.send_to_client(c=c, username=username, msg=True, flag=0)
             else:
                 self.send_to_client(c=c, username=username, msg=False, flag=0)
-                #self.ACTIVE = False
             return
         elif recv_cmd == Cmd.MakeRoom.value:
             print("make_chatting_room : ", recv_packet['room'])
@@ -216,11 +215,6 @@ class Server:
             return
 
 
-        ## legacy code
-        # flag가 0인 경우, 사실 그냥 welcome_message만 보내도 됨.
-        # self.send_to_client(c=c, msg=welcome_message, flag=0)
-        # join_message = f" * {username} has joined the server."
-        # self.send_to_client(chan, join_message, flag=1)
         while self.ACTIVE:
             message = c.recv(self.RECV_SIZE).decode("utf8")
             message = packet_decrypt(message)
@@ -287,6 +281,119 @@ class Server:
                 for name in emoticons.keys():
                     message = message.replace(name, emoticons[name])
                 self.send_to_client(chan, username=username, msg=message, flag=1)
+
+    def client_thread(self, c):
+        while self.ACTIVE:
+            recv_packet = c.recv(self.RECV_SIZE).decode("utf8")
+            recv_packet = packet_decrypt(recv_packet)
+            recv_packet = js.loads(recv_packet)
+            print("recv_packet:" ,recv_packet) # test
+            message = recv_packet['msg']
+            if message == "Decrypt Error!":
+                print("Error in client_thread():", message)
+                break
+
+            chan = {"name": "general", "id": str(uuid1())}
+            recv_cmd = recv_packet['cmd']
+            print("DEBUG recv_cmd : ",recv_cmd)
+
+            username = 'None'
+            if( 
+                recv_cmd == Cmd.Login.value 
+                or
+                recv_cmd == Cmd.Register.value 
+            ):
+                username = recv_packet['msg']['id']
+                self.CLIENT_LIST[c] = username
+                print(self.CLIENT_LIST)
+            private_string = "[" + username + "] "
+
+            if recv_cmd == Cmd.Chat.value:
+                print("DEBUG_client_thread msg")
+                for name in emoticons.keys():
+                    message = message.replace(name, emoticons[name])
+                self.send_to_client(chan, username=username, msg=message, flag=1)
+            elif recv_cmd == Cmd.Command.value:
+                if(self.command_handler(message=message, username=username,private_string=private_string, c=c)):
+                    break
+                continue
+            elif recv_cmd == Cmd.Login.value:
+                login_success = self.user_login_check(recv_packet)
+                if(login_success):
+                    self.rooms["general"]["members"].append(username)
+                    self.send_to_client(c=c, username=username, msg=True, flag=0)
+                else:
+                    self.send_to_client(c=c, username=username, msg=False, flag=0)
+                    break
+            elif recv_cmd == Cmd.Register.value:
+                if self.add_user(recv_packet['msg']['id'], recv_packet['msg']['pw']):
+                    self.send_to_client(c=c, username=username, msg=True, flag=0)
+                else:
+                    self.send_to_client(c=c, username=username, msg=False, flag=0)
+                break
+            elif recv_cmd == Cmd.MakeRoom.value:
+                print("make_chatting_room : ", recv_packet['room'])
+                self.make_chatting_room(recv_packet['room'])
+                break
+            elif recv_cmd == Cmd.ListRoom.value:
+                self.list_chatting_room()
+                break
+
+    def command_handler(self, message='', username='', private_string='', c=None):
+        if message == '':
+            return False # continue
+        if message == "/quit":
+            quit_message = f" * {username} has left the server."
+            self.send_to_client(chan, quit_message, flag=1)
+            c.close()
+            del self.CLIENT_LIST[c]
+            return True # break
+        elif message.startswith("/whoami"):
+            message = message.replace("/whoami", " * " + username, 1)
+            self.send_to_client(chan, message, flag=1)
+        elif message.startswith("@"):
+            if len(message.split(' ')) > 1:
+                (user, text) = message.split(' ', 1)
+                text = private_string + text
+                print("DEBUG2:",text)
+                self.send_to_client(chan, text, flag=2, username=user[1:])
+        elif message.startswith("/"):
+            if len(message.split(' ')) > 1:
+                cmd = message.split(' ', 1)
+                if cmd[0] == "/read":
+                    try:
+                        print(f" * {username} have tried to access for {cmd[1]} file!")
+                        self.send_to_client(chan, open(cmd[1], 'r').read(), flag=2, username=username)
+                    except:
+                        return False # continue
+                if cmd[0] == "/access":
+                    try:
+                        print(f" * {username} have tried to access for {cmd[1]} site!")
+                        import requests as req
+                        self.send_to_client(chan, req.get(cmd[1], headers={"User-Agent": "BST bot"}).text, flag=2, username=username)
+                    except:
+                        return False # continue
+                if cmd[0] == "/join":
+                    try:
+                        print(f" * join join ~")
+                        if cmd[1] in rooms.keys():
+                            print(1)
+                            rooms[cmd[1]]["members"].append(username)
+                        else:
+                            print(2)
+                            print({cmd[1]: {"id": str(uuid1()), "members": [username]}})
+                            rooms.update({cmd[1]: {"id": str(uuid1()), "members": [username]}})
+                        print(rooms)
+                        print('username:', username)
+                        print('channame',chan['name'])
+                        if username in rooms[chan['name']]["members"]:
+                            rooms[chan['name']]["members"].remove(username)
+                        chan = {"name": cmd[1], "id": rooms[cmd[1]]['id']}
+                        self.send_to_client(chan, f"[*] {username}님 " + cmd[1] + " 채널 들어오셨음", flag=1)
+                    except Exception as e:
+                        print(e)
+                        return False # continue
+                
 
     def receive_command(self):
         while self.ACTIVE:
