@@ -61,7 +61,7 @@ class login_class(QMainWindow, loginForm):
             self.hide()
             self.lobby_window = lobby_window(self.CLIENT)
             self.lobby_window.mynamelabel.setText("hi, {}".format(id))
-            self.lobby_window.refreshRoomList()
+            self.lobby_window.refreshRoomList(None)
             self.lobby_window.exec()
         else:
             self.CLIENT.reconnect()
