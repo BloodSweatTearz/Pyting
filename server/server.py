@@ -173,6 +173,7 @@ class Server:
 
     def client_thread(self, c):
         username = 'None'
+        chan = {"name": "general", "id": str(uuid1())}
         while self.ACTIVE:
             recv_packet = c.recv(self.RECV_SIZE).decode("utf8")
             recv_packet = packet_decrypt(recv_packet)
@@ -183,7 +184,6 @@ class Server:
                 print("Error in client_thread():", message)
                 break
 
-            chan = {"name": "general", "id": str(uuid1())}
             recv_cmd = recv_packet['cmd']
             print("DEBUG recv_cmd : ",recv_cmd)
 
@@ -240,33 +240,33 @@ class Server:
             return False, chan # continue
         if message == "/quit":
             quit_message = f" * {username} has left the server."
-            self.send_to_client(chan=chan, message=quit_message, flag=1)
+            self.send_to_client(chan=chan, msg=quit_message, flag=1)
             c.close()
             del self.CLIENT_LIST[c]
             return True, chan # break
         elif message.startswith("/whoami"):
             message = message.replace("/whoami", " * " + username, 1)
-            self.send_to_client(chan=chan, message=message, flag=1)
+            self.send_to_client(chan=chan, msg=message, flag=1)
         elif message.startswith("@"):
             if len(message.split(' ')) > 1:
                 (user, text) = message.split(' ', 1)
                 text = private_string + text
                 print("DEBUG2:",text)
-                self.send_to_client(chan=chan, message=text, flag=2, username=user[1:])
+                self.send_to_client(chan=chan, msg=text, flag=2, username=user[1:])
         elif message.startswith("/"):
             if len(message.split(' ')) > 1:
                 cmd = message.split(' ', 1)
                 if cmd[0] == "/read":
                     try:
                         print(f" * {username} have tried to access for {cmd[1]} file!")
-                        self.send_to_client(chan=chan, message=open(cmd[1], 'r').read(), flag=2, username=username)
+                        self.send_to_client(chan=chan, msg=open(cmd[1], 'r').read(), flag=2, username=username)
                     except:
                         return False, chan # continue
                 if cmd[0] == "/access":
                     try:
                         print(f" * {username} have tried to access for {cmd[1]} site!")
                         import requests as req
-                        self.send_to_client(chan=chan, message=req.get(cmd[1], headers={"User-Agent": "BST bot"}).text, flag=2, username=username)
+                        self.send_to_client(chan=chan, msg=req.get(cmd[1], headers={"User-Agent": "BST bot"}).text, flag=2, username=username)
                     except:
                         return False, chan # continue
                 if cmd[0] == "/join":
@@ -286,7 +286,7 @@ class Server:
                         if username in self.rooms[chan['name']]["members"]:
                             self.rooms[chan['name']]["members"].remove(username)
                         chan = {"name": cmd[1], "id": self.rooms[cmd[1]]['id']}
-                        self.send_to_client(chan=chan, message=f"[*] {username}님 " + cmd[1] + " 채널 들어오셨음", flag=1)
+                        self.send_to_client(chan=chan, msg=f"[*] {username}님 " + cmd[1] + " 채널 들어오셨음", flag=1)
                     except Exception as e:
                         print("HEERERE : ",e)
                         return False, chan # continue
@@ -300,19 +300,19 @@ class Server:
             if command.startswith("/say"):
                 comment = command.split(' ', 1)
                 if len(command.split(' ')) > 1:
-                    self.send_to_client(chan=ADMIN_PERM, message="[Notice] {}".format(comment[1]), flag=1, username="ADMIN")
+                    self.send_to_client(chan=ADMIN_PERM, msg="[Notice] {}".format(comment[1]), flag=1, username="ADMIN")
                 else:
                     print(f"Usage: {comment[0]} [something]")
             elif command.startswith("/kick"):
                 user = command.split(' ', 2)
                 if len(command.split(' ')) > 1:
-                    self.send_to_client(chan=ADMIN_PERM, message="you kicked", flag=2, username=user[1])
+                    self.send_to_client(chan=ADMIN_PERM, msg="you kicked", flag=2, username=user[1])
                 else:
                     print(f"Usage: {user[0]} [username] [reason]")
             elif command.startswith("/shutdown"):
                 choose = input("Are you sure to shutdown the server? (y/n):")
                 if choose == 'y':
-                    self.send_to_client(chan=ADMIN_PERM, message="\n[!] The server will be closed.", flag=1)
+                    self.send_to_client(chan=ADMIN_PERM, msg="\n[!] The server will be closed.", flag=1)
                     self.SERVER.close()
                     self.ACTIVE = False # TEST
                     exit(0)
@@ -348,6 +348,7 @@ class Server:
             user = self.CLIENT_LIST[c]
             print("user:", user)
             print("chan:", self.rooms[chan['name']]['members'])
+            print("chan1:", chan)
             print("user가 chan에 해당하는지 비교")
             if user in self.rooms[chan['name']]['members']:
                 c.send(packet_encrypt(m).encode(encoding="utf-8"))
