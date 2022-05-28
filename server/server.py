@@ -193,10 +193,10 @@ class Server:
             recv_cmd = recv_packet['cmd']
             print("DEBUG recv_cmd : ",recv_cmd)
 
-            if( 
-                recv_cmd == Cmd.Login.value 
+            if(
+                recv_cmd == Cmd.Login.value
                 or
-                recv_cmd == Cmd.Register.value 
+                recv_cmd == Cmd.Register.value
             ):
                 username = recv_packet['msg']['id']
                 self.CLIENT_LIST[c] = username
@@ -224,7 +224,6 @@ class Server:
                 login_success = self.user_login_check(recv_packet)
                 if(login_success):
                     print("USERNAME : ",username)
-                    self.rooms["general"]["members"].append(username)
                     self.send_to_client(c=c, username=username, msg=True, flag=0)
                 else:
                     self.send_to_client(c=c, username=username, msg=False, flag=0)
@@ -284,6 +283,8 @@ class Server:
                 if cmd[0] == "/join":
                     try:
                         print(f" * join join ~")
+                        if username in self.rooms[chan['name']]["members"]:
+                            self.rooms[chan['name']]["members"].remove(username)
                         if cmd[1] in self.rooms.keys():
                             print(1)
                             if(username not in self.rooms[cmd[1]]["members"]):
@@ -295,15 +296,13 @@ class Server:
                         print(self.rooms)
                         print('username:', username)
                         print('channame',chan['name'])
-                        if username in self.rooms[chan['name']]["members"]:
-                            self.rooms[chan['name']]["members"].remove(username)
                         chan = {"name": cmd[1], "id": self.rooms[cmd[1]]['id']}
                         self.send_to_client(chan=chan, msg=f"[*] {username}님 " + cmd[1] + " 채널 들어오셨음", flag=1)
                     except Exception as e:
                         print("HEERERE : ",e)
                         return False, chan # continue
         return False, chan
-                
+
 
     def receive_command(self):
         while self.ACTIVE:
@@ -364,7 +363,7 @@ class Server:
             print("user가 chan에 해당하는지 비교")
             if user in self.rooms[chan['name']]['members']:
                 c.send(packet_encrypt(m).encode(encoding="utf-8"))
-                print("send_all success!")    
+                print("send_all success!")
         print("print in server send_all(): ", m)
 
     def send_user(self, m, u, chan):
