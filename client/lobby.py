@@ -58,7 +58,8 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         if chan_name == '':
             QMessageBox.about(self, "Channel Name", 'Please type channel name!')
             return
-        self.CLIENT.make_chatting_room(chan_name)
+        self.chatEdit.setText("/join {}".format(chan_name))
+        self.sendChat()
         self.makeChatEdit.clear()
         self.connectRoom()
         self.chatWidget.scrollToBottom()
