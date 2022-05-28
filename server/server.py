@@ -10,7 +10,7 @@ sys.path.append("../")
 from cipher import *
 from commands import Cmd
 
-emoticons = js.loads(open("emoticons.json", "r").read())
+emoticons = js.loads(open("../server/emoticons.json", "r").read())
 #rooms = {"하이": {"id": str(uuid1()), "members": []}}
 #rooms = {"general": {"id": str(uuid1()), "members": []}}
 users = { "asdf": "1234" , "pang": "1234", "qwer": "1234"}
