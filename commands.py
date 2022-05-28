@@ -7,5 +7,3 @@ class Cmd(Enum):
     Register = 3
     MakeRoom = 4
     ListRoom = 5
-
-#print(Cmd.Chat.value)

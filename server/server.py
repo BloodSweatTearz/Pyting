@@ -198,7 +198,7 @@ class Server:
                 self.send_to_client(c=c, username=username, msg=True, flag=0)
             else:
                 self.send_to_client(c=c, username=username, msg=False, flag=0)
-            return
+                return
         elif recv_cmd == Cmd.Register.value:
             if self.add_user(recv_packet['msg']['id'], recv_packet['msg']['pw']):
                 self.send_to_client(c=c, username=username, msg=True, flag=0)
@@ -278,7 +278,7 @@ class Server:
             else:
                 for name in emoticons.keys():
                     message = message.replace(name, emoticons[name])
-                self.send_to_client(chan, username, message, flag=1)
+                self.send_to_client(chan, username=username, msg=message, flag=1)
 
     def receive_command(self):
         while self.ACTIVE:
