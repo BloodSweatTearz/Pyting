@@ -81,15 +81,6 @@ class Client:
         self.USERNAME = "pang"
         self.PASSWORD = "1234"
 
-    def make_chatting_room(self, room_name):
-        print("[make_chatting_room] called")
-        info = {"name": room_name, "username": self.USERNAME}
-        send_packet = self.dtoj(Cmd.MakeRoom, "/join " + room_name)
-        print((Cmd.MakeRoom, "/join " + room_name))
-        print(" send_packet ", send_packet)
-        a = self.CLIENT.send(packet_encrypt(send_packet).encode(encoding='utf-8'))
-        print(a)
-
     # 로그인 체크
     def login_check(self, username, password):
         # send info
@@ -291,7 +282,5 @@ if __name__ == "__main__":
     client = Client()
     client.login_test()
     client.run_client()
-    client.send_chat("asdasd")
     client.receive_message()
-
     exit(0)
