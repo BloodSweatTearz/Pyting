@@ -65,7 +65,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         self.connectRoom()
         self.chatWidget.scrollToBottom()
 
-    def refreshRoomList(self):
+    def refreshRoomList(self, event):
         self.roomlist.clear()
         res = self.CLIENT.get_room_list()
         from PyQt5.QtWidgets import QListWidgetItem
@@ -95,6 +95,9 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         elif (sysCmd is not None) and (self.chatEdit.text().find(sysCmd[0]) == 1):
             #채팅이 아니라 명령어 실행
             print("명령어!!")
+            self.CLIENT.send_message(self.chatEdit.text())
+            self.chatEdit.clear()
+            self.chatWidget.scrollToBottom()
 
     def exitRoom(self):
         self.chatWidget.clear()
