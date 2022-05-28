@@ -57,7 +57,8 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         self.roomlist.addItem(item)
 
     def makeChat(self):
-        pass
+        self.chatEdit.setText("/join {}".format(self.makeChatEdit.text()))
+        self.sendChat()
 
     def refreshRoomList(self, event):
         pass

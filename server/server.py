@@ -143,8 +143,6 @@ class Server:
             self.send_all(js.dumps({"rooms": rooms, "username" : username, "msg": msg}), chan)
         elif flag == 2:
             self.send_user(js.dumps({"rooms": rooms,"username" : username, "msg": msg}), username, chan)
-        elif flag == 3: #makeRoom Alert
-            self.send_all(msg, chan)
 
         else:
             pass
