@@ -252,6 +252,15 @@ class Client:
             ):
                 continue
 
+            if("whisper_flag" in packet_data):
+                if(packet_data["whisper_flag"]):
+                    print("print_message4")
+                    from PyQt5.QtWidgets import QListWidgetItem
+                    item = QListWidgetItem('<{}> {}'.format(packet_data["username"], packet_data["msg"]))
+                    lobbyForm.chatWidget.addItem(item)
+                    print("print_message5")
+                    continue
+
             if packet_data["username"] != self.USERNAME:
                 print("print_message2")
                 from PyQt5.QtWidgets import QListWidgetItem

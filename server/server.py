@@ -143,6 +143,8 @@ class Server:
             self.send_all(js.dumps({"rooms": self.rooms, "username" : username, "msg": msg}), chan)
         elif flag == 2:
             self.send_user(js.dumps({"rooms": self.rooms,"username" : username, "msg": msg}), username, chan)
+        elif flag == 3:
+            self.send_user(js.dumps({"rooms": self.rooms,"username" : username, "msg": msg, "whisper_flag":True}), username, chan)
         else:
             pass
 
@@ -249,12 +251,12 @@ class Server:
             self.send_to_client(chan=chan, msg=message, flag=1)
         elif message.startswith("/whisper"): # whispher
             print('whisper')
-            if len(message.split(' ')) > 1:
-                data = message.split(' ')
+            if len(message.split(' ')) > 2:
+                data = message.split(' ', 2)
                 user = data[1]
                 msg = data[2]
                 print("DEBUG2:",msg)
-                self.send_to_client(chan=chan, msg=msg, flag=2, username=user)
+                self.send_to_client(chan=chan, msg=msg, flag=3, username=user)
         elif message.startswith("/"):
             if len(message.split(' ')) > 1:
                 cmd = message.split(' ', 1)
@@ -364,9 +366,15 @@ class Server:
                     c.send(packet_encrypt(m).encode(encoding="utf-8"))
                 continue
             user = self.CLIENT_LIST[c]
+            print("send_user user :",user, u)
+            print("send_user2 : ", self.rooms[chan['name']]['members'])
             if user in self.rooms[chan['name']]['members']:
-                if self.CLIENT_LIST[c] == u:
+                if user == u:
+                    print("you caught this")
                     c.send(packet_encrypt(m).encode(encoding="utf-8"))
+                    print('user',user)
+                    print('u',u)
+                    print('m',m)
 
 # TEST
 if __name__ == "__main__":

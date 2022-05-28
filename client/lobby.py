@@ -63,7 +63,13 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         self.chatEdit.setText("/join {}".format(chan_name))
         self.sendChat()
         self.makeChatEdit.clear()
-        self.connectRoom()
+        self.sendChat()
+        self.chatEdit.setText("")
+
+        self.form_size(1)
+        self.roomlist.clearSelection()
+        self.roomlist.clearFocus()
+
         self.chatWidget.scrollToBottom()
 
     def refreshRoomList(self, event):
@@ -112,12 +118,15 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             elif sysCmd[0] == "whoami":
                 command = QListWidgetItem("----you are {}----".format(self.CLIENT.USERNAME))
                 self.chatWidget.addItem(command)
+            elif sysCmd[0] == "whisper":
+                message = self.chatEdit.text()
+                data = message.split(' ', 2)
+                user = data[1]
+                msg = data[2]
+                self.CLIENT.send_message(message)
+                self.drawChat(f"me->{user}", msg)
             else:
                 self.CLIENT.send_message(self.chatEdit.text())
-
-
-
-
         self.chatEdit.clear()
         self.chatWidget.scrollToBottom()
 
