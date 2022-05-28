@@ -84,7 +84,8 @@ class Client:
     def make_chatting_room(self, room_name):
         print("[make_chatting_room] called")
         info = {"name": room_name, "username": self.USERNAME}
-        send_packet = self.dtoj(Cmd.MakeRoom, info)
+        send_packet = self.dtoj(Cmd.MakeRoom, "/join " + room_name)
+        print((Cmd.MakeRoom, "/join " + room_name))
         print(" send_packet ", send_packet)
         a = self.CLIENT.send(packet_encrypt(send_packet).encode(encoding='utf-8'))
         print(a)
@@ -241,10 +242,10 @@ class Client:
 
     def get_room_list(self):
         res = []
+        print("selfroom", self.ROOMS)
         for room in self.ROOMS.keys():
             res.append(room)
         return res
-
 
     def print_message(self, lobbyForm):
         while self.ACTIVE:
@@ -256,7 +257,7 @@ class Client:
             if(
                 packet_data == None
                 or
-                packet_data['msg'] == "Decrypt Error!"                
+                packet_data['msg'] == "Decrypt Error!"
             ):
                 continue
 
