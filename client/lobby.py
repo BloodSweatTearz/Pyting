@@ -13,9 +13,10 @@ from cipher import *
 class lobby_window(QDialog, QWidget, lobbyForm):
 
     cmd = [ # command, parameter, detail tips
-            ["help", "", "you can get some tips"],
-            ["whisper", "nicname", "You can tell users secretly"],
-            ["exit", "", "exit chat room"]
+            ["help", "", "you can get some tips."],
+            ["join", "room", "you can join room with command."],
+            ["whisper", "nicname", "You can tell users secretly."],
+            ["exit", "", "exit chat room."]
     ]
 
     enable_cmd_tooltip = False
