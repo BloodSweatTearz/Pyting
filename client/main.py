@@ -60,7 +60,7 @@ class login_class(QMainWindow, loginForm):
         if is_success:
             self.hide()
             self.lobby_window = lobby_window(self.CLIENT)
-            self.lobby_window.mynamelabel.setText("hello, {}".format(id))
+            self.lobby_window.mynamelabel.setText("hi, {}".format(id))
             self.lobby_window.refreshRoomList()
             self.lobby_window.exec()
         else:
