@@ -61,7 +61,12 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         self.sendChat()
 
     def refreshRoomList(self, event):
-        pass
+        self.roomlist.clear()
+        res = self.CLIENT.get_room_list()
+        from PyQt5.QtWidgets import QListWidgetItem
+        for room in res:
+            room_item = QListWidgetItem(room)
+            self.roomlist.addItem(room_item)
 
     def connectRoom(self):
         from PyQt5.QtCore import QModelIndex
