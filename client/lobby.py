@@ -51,15 +51,17 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         self.CLIENT.start_io_loop(self)
 
     def create_dummy(self):
-        item = QListWidgetItem('안녕')
-        self.roomlist.addItem(item)
-        item = QListWidgetItem('다들드러왕')
-        self.roomlist.addItem(item)
+        pass
 
     def makeChat(self):
-        self.chatEdit.setText("/join {}".format(self.makeChatEdit.text()))
-        self.sendChat()
-        self.chatEdit.clear()
+        chan_name = self.makeChatEdit.text()
+        if chan_name == '':
+            QMessageBox.about(self, "Channel Name", 'Please type channel name!')
+            return
+        self.CLIENT.make_chatting_room(chan_name)
+        self.makeChatEdit.clear()
+        self.connectRoom()
+        self.chatWidget.scrollToBottom()
 
     def refreshRoomList(self, event):
         self.roomlist.clear()
@@ -70,10 +72,9 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             self.roomlist.addItem(room_item)
 
     def connectRoom(self):
-        room_name = self.roomlist.currentItem().text()
-        self.chatEdit.setText("/join {}".format(room_name))
-        self.sendChat()
-        self.chatEdit.setText("")
+        from PyQt5.QtCore import QModelIndex
+        self.roomlist.setCurrentIndex(QModelIndex())
+
         self.form_size(1)
         self.roomlist.clearSelection()
         self.roomlist.clearFocus()
@@ -99,6 +100,12 @@ class lobby_window(QDialog, QWidget, lobbyForm):
     def drawChat(self, sender, msg):
         chatItem = QListWidgetItem("[{}] {}".format(sender, msg))
         self.chatWidget.addItem(chatItem)
+        self.memberList.clear()
+        users = self.CLIENT.USERLIST
+        for user in users:
+            memberItem = QListWidgetItem(user)
+            self.memberList.addItem(memberItem)
+        self.chatWidget.scrollToBottom()
 
     def chat_can_command(self):
         #return Command List
@@ -159,7 +166,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         if re == QMessageBox.Yes:
             QCloseEvent.accept()
         else:
-            QCloseEvent.ignore()  
+            QCloseEvent.ignore()
         '''
         self.CLIENT.ACTIVE = False
         self.CLIENT.disconnect()
