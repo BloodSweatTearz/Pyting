@@ -30,11 +30,12 @@ class Client:
         # 모든 방 리스트
         # {ROOM_NAME:{"UUID":"", "MEMBERS":[]}, ...}
         self.ROOMS = {}
-        
+
         # 내가 접속중인 방
-        # default : -1 : 아무 방에도 접속 중이지 않음 
+        # default : -1 : 아무 방에도 접속 중이지 않음
         # value : ROOM_UUID
-        self.CURRENT_ROOM = -1 
+        self.DEFAULT_CHANNEL_NAME = "general"
+        self.CURRENT_ROOM = -1
 
         # 접속 중인 방의 유저 리스트
         self.USERLIST = []
@@ -97,7 +98,8 @@ class Client:
 
         # recv result
         info_result = self.receive_message()
-        self.CURRENT_ROOM = info_result["rooms"]["general"]["id"]
+        #self.CURRENT_ROOM = info_result["rooms"]["general"]["id"]
+        self.CURRENT_ROOM = self.DEFAULT_CHANNEL_NAME
 
         #todo : draw member by info_result["rooms"]["general"]["members"] dict
         print("WHAT????:",info_result)
@@ -134,11 +136,11 @@ class Client:
             return False
         except:
             return False
-    
+
     # 룸 정보 초기화
     def room_list_refresh(self, recv_packet):
         self.ROOMS = recv_packet["rooms"]
-        
+
     # 룸 유저정보 초기화
     def room_member_list_refresh(self, recv_packet):
         if not self.where_am_i(recv_packet):
@@ -147,6 +149,8 @@ class Client:
         # if(recv_packet['rooms']["current_room_uuid"] != -1):
         #     self.USERLIST = recv_packet["members"]
         if(self.CURRENT_ROOM != -1):
+            print(type(recv_packet))
+            print(recv_packet)
             self.USERLIST = recv_packet['rooms'][self.CURRENT_ROOM]['members']
 
     # data to json
@@ -213,6 +217,7 @@ class Client:
             message = packet_decrypt(message)
             message = self.jtod(message) # 받은 json을 data로 변경
             if(message["msg"] == "Decrypt Error!"):
+                self.ACTIVE = False
                 return message
             '''
                 {
@@ -233,10 +238,12 @@ class Client:
             return message
         except OSError:
             self.ACTIVE = False
-    
+
     def print_message(self, lobbyForm):
         while self.ACTIVE:
+            print("print_message1")
             packet_data = self.receive_message()
+            print(packet_data)
             print("recv ", packet_data)
             # error !!!!!l
             if(
@@ -247,9 +254,11 @@ class Client:
                 continue
 
             if packet_data["username"] != self.USERNAME:
+                print("print_message2")
                 from PyQt5.QtWidgets import QListWidgetItem
                 item = QListWidgetItem('[{}] {}'.format(packet_data["username"], packet_data["msg"]))
                 lobbyForm.chatWidget.addItem(item)
+                print("print_message3")
 
     def run_client(self):
         self.setup()
@@ -257,7 +266,7 @@ class Client:
             self.start_io_loop()
             self.CLIENT.close()
         self.CLIENT.close()
-    
+
     def reconnect(self):
         self.CLIENT.close()
         ip_address = self.IP_ADDRESS

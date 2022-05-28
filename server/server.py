@@ -98,7 +98,7 @@ class Server:
         self.SERVER_LOOP.start()
         Thread(target=self.receive_command, args=()).start()
         self.SERVER_LOOP.join()
-        
+
     def listen_incoming(self):
         self.SERVER.listen(self.MAX_CLIENTS)
         print(f"Currently listening for up to {self.MAX_CLIENTS} clients...\n")
@@ -154,7 +154,7 @@ class Server:
 
     # password는 아직은 평문
     def add_user(self, username, password): # register
-        
+
         user_info = {}
         self.LOCK.acquire() # Race Condition 방지
         if(username in self.USERS.keys()):
@@ -214,7 +214,7 @@ class Server:
         elif recv_cmd == Cmd.ListRoom.value:
             self.list_chatting_room()
             return
-            
+
 
         ## legacy code
         # flag가 0인 경우, 사실 그냥 welcome_message만 보내도 됨.
@@ -273,7 +273,10 @@ class Server:
                                 print({cmd[1]: {"id": str(uuid1()), "members": [username]}})
                                 rooms.update({cmd[1]: {"id": str(uuid1()), "members": [username]}})
                             print(rooms)
-                            rooms[chan['name']]["members"].remove(username)
+                            print('username:', username)
+                            print('channame',chan['name'])
+                            if username in rooms[chan['name']]["members"]:
+                                rooms[chan['name']]["members"].remove(username)
                             chan = {"name": cmd[1], "id": rooms[cmd[1]]['id']}
                             self.send_to_client(chan, f"[*] {username}님 " + cmd[1] + " 채널 들어오셨음", flag=1)
                         except Exception as e:
