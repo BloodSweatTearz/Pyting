@@ -95,7 +95,17 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             parameter = self.chatEdit.text().split(' ')
             if sysCmd[0] == "join" and parameter[1] is not None:
                 self.mynamelabel.setText("hi, {}\n you are on channel {}".format(self.CLIENT.USERNAME, parameter[1]))
-            self.CLIENT.send_message(self.chatEdit.text())
+                self.CLIENT.send_message(self.chatEdit.text())
+            elif sysCmd[0] == "help":
+                command = QListWidgetItem("----chatting command helper----")
+                self.chatWidget.addItem(command)
+                for command in self.cmd:
+                    print(command)
+                    command = QListWidgetItem("/{} {} - {}".format(command[0], command[1], command[2]))
+                    self.chatWidget.addItem(command)
+                command = QListWidgetItem("-----------------------------------------------")
+                self.chatWidget.addItem(command)
+
         self.chatEdit.clear()
         self.chatWidget.scrollToBottom()
 
