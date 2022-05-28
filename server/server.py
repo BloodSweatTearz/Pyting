@@ -8,7 +8,7 @@ from uuid import *
 
 sys.path.append("../")
 from cipher import *
-from cmd import Cmd
+from commands import Cmd
 
 emoticons = js.loads(open("emoticons.json", "r").read())
 #rooms = {"하이": {"id": str(uuid1()), "members": []}}
@@ -169,8 +169,8 @@ class Server:
             fp.write(js.dumps(user_info))
 
         print(f"[O] Register Success : {username}, {password}")
-        self.LOCK.release()
         self.load_users()
+        self.LOCK.release()
         return True
 
     def client_thread(self, c):
@@ -186,8 +186,6 @@ class Server:
 
         recv_cmd = recv_packet['cmd']
         print("DEBUG recv_cmd : ",recv_cmd)
-        
-        rooms["general"]["members"].append(username)
 
         user_string = "<" + username + "> "
         private_string = "[" + username + "] "
@@ -196,6 +194,7 @@ class Server:
         if recv_cmd == Cmd.Login.value:
             login_success = self.user_login_check(recv_packet)
             if(login_success):
+                self.rooms["general"]["members"].append(username)
                 self.send_to_client(c=c, username=username, msg=True, flag=0)
             else:
                 self.send_to_client(c=c, username=username, msg=False, flag=0)

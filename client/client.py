@@ -10,7 +10,7 @@ import sys
 
 sys.path.append("../")
 from cipher import *
-from cmd import Cmd
+from commands import Cmd
 
 class Client:
     def __init__(self, IP_ADDRESS="127.0.0.1", PORT=8000, RECV_SIZE=4096):
@@ -80,7 +80,6 @@ class Client:
         self.USERNAME = "pang"
         self.PASSWORD = "1234"
 
-
     def make_chatting_room(self, room_name):
         print("[make_chatting_room] called")
         info = {"name": room_name, "username": self.USERNAME}
@@ -88,7 +87,6 @@ class Client:
         print(" send_packet ", send_packet)
         a = self.CLIENT.send(packet_encrypt(send_packet).encode(encoding='utf-8'))
         print(a)
-
 
     # 로그인 체크
     def login_check(self, username, password):

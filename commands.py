@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class Cmd(Enum):
     Chat = 0
     Command = 1
@@ -9,3 +8,4 @@ class Cmd(Enum):
     MakeRoom = 4
     ListRoom = 5
 
+#print(Cmd.Chat.value)
