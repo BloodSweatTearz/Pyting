@@ -200,7 +200,16 @@ class Client:
 
     def receive_message(self):
         try:
-            message = self.CLIENT.recv(self.RECV_SIZE).decode("utf8")
+            self.CLIENT.settimeout(1)
+            try:
+                message = self.CLIENT.recv(self.RECV_SIZE).decode("utf8")
+            except Exception as e: # socket.timeout
+                print("RECV TIMEOUT!!! : ",e) # reset
+                self.CLIENT.settimeout(None)
+                return {'msg' : "Decrypt Error!"}
+            self.CLIENT.settimeout(None) # reset
+
+            print("DEBUG[message] :",message)
             message = packet_decrypt(message)
             message = self.jtod(message) # 받은 json을 data로 변경
             if(message["msg"] == "Decrypt Error!"):
@@ -229,6 +238,14 @@ class Client:
         while self.ACTIVE:
             packet_data = self.receive_message()
             print("recv ", packet_data)
+            # error !!!!!l
+            if(
+                packet_data == None
+                or
+                packet_data['msg'] == "Decrypt Error!"                
+            ):
+                continue
+
             if packet_data["username"] != self.USERNAME:
                 from PyQt5.QtWidgets import QListWidgetItem
                 item = QListWidgetItem('[{}] {}'.format(packet_data["username"], packet_data["msg"]))

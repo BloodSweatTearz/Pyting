@@ -117,6 +117,7 @@ class Server:
             #todo: 방 이름 중복검사 로직 추가해야댐 - 성훈
             new_room = {name: {"id": str(uuid1()), "members": []}}
             self.rooms.update(new_room)
+            print("DEBUG_make_chatting_room : ",name)
             self.send_to_client(ADMIN_PERM, msg= "make rooms : " + name, flag=1, username="ADMIN")
             print("[make_chatting_room] Chatting Room created : ", new_room)
         else:
@@ -225,6 +226,9 @@ class Server:
             message = packet_decrypt(message)
             pkt = js.loads(message)
             message = pkt['msg']
+            if message == "Decrypt Error!":
+                print("Error in client_thread():", pkt)
+                break
             if message == '':
                 continue
             if message == "/quit":
@@ -276,6 +280,7 @@ class Server:
                             print(e)
                             continue
             else:
+                print("DEBUG_client_thread msg")
                 for name in emoticons.keys():
                     message = message.replace(name, emoticons[name])
                 self.send_to_client(chan, username=username, msg=message, flag=1)

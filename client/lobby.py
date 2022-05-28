@@ -2,7 +2,7 @@ import functools
 import re
 
 from PyQt5.QtGui import QPixmap, QColor, QTextCursor
-from PyQt5.QtWidgets import QWidget, QDialog, QListWidgetItem
+from PyQt5.QtWidgets import QWidget, QDialog, QListWidgetItem, QMessageBox
 
 from ui.pytingUI import lobbyForm, center, fix_window_size
 
@@ -142,3 +142,16 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             fix_window_size(self, 240, 450)
         if set == 1:
             fix_window_size(self, 800, 450)
+
+    def closeEvent(self, QCloseEvent):
+        '''
+        re = QMessageBox.question(self, "종료 확인", "종료 하시겠습니까?",
+                    QMessageBox.Yes|QMessageBox.No)
+
+        if re == QMessageBox.Yes:
+            QCloseEvent.accept()
+        else:
+            QCloseEvent.ignore()  
+        '''
+        self.CLIENT.ACTIVE = False
+        self.CLIENT.disconnect()
