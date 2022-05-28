@@ -254,7 +254,6 @@ class Client:
                 continue
 
             if("whisper_flag" in packet_data):
-                print('sibal'*1000)
                 print("print_message4")
                 from PyQt5.QtWidgets import QListWidgetItem
                 item = QListWidgetItem('<{}->me> {}'.format(packet_data["sender"], packet_data["msg"]))
@@ -268,6 +267,7 @@ class Client:
                 item = QListWidgetItem('[{}] {}'.format(packet_data["username"], packet_data["msg"]))
                 lobbyForm.chatWidget.addItem(item)
                 print("print_message3")
+            lobbyForm.chatWidget.scrollToBottom()
 
     def run_client(self):
         self.setup()
