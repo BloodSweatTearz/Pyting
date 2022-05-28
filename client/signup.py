@@ -12,6 +12,9 @@ class signup_window(QDialog, QWidget, signupForm):
         center(self)
         fix_window_size(self, 175, 175)
 
+        self.pw.setEchoMode(QLineEdit.Password)
+        self.pw_re.setEchoMode(QLineEdit.Password)
+
         self.registerBtn.clicked.connect(self.register)
         
     def register(self):
