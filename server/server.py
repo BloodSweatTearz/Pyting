@@ -73,7 +73,7 @@ class Server:
 
     # login check
     def user_login_check(self, user_info):
-        user_id = user_info['msg']['id']
+        user_id = user_info['msg']['id'].replace(' ', '_')
         user_pw = user_info['msg']['pw']
         print("DEBUG1 : ",user_id, user_pw)
         try:
@@ -153,6 +153,8 @@ class Server:
 
     # password는 아직은 평문
     def add_user(self, username, password): # register
+
+        username = username.replace(' ', '_')
 
         user_info = {}
         self.LOCK.acquire() # Race Condition 방지
