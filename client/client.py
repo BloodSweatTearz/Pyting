@@ -244,7 +244,7 @@ class Client:
             packet_data = self.receive_message()
             print(packet_data)
             print("recv ", packet_data)
-            # error !!!!!l
+            # error !!!!!
             if(
                 packet_data == None
                 or
