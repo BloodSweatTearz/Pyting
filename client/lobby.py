@@ -76,7 +76,6 @@ class lobby_window(QDialog, QWidget, lobbyForm):
     def connectRoom(self):
         room_name = self.roomlist.currentItem().text()
         self.chatEdit.setText("/join {}".format(room_name))
-        self.mynamelabel.setText("hi, {}\n you are on channel {}".format(self.CLIENT.USERNAME, room_name))
         self.sendChat()
         self.chatEdit.setText("")
 
@@ -90,14 +89,15 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             #채팅 보내면 됨.
             self.CLIENT.send_message(self.chatEdit.text())
             self.drawChat("me", self.chatEdit.text())
-            self.chatEdit.clear()
-            self.chatWidget.scrollToBottom()
         elif (sysCmd is not None) and (self.chatEdit.text().find(sysCmd[0]) == 1):
             #채팅이 아니라 명령어 실행
             print("명령어!!")
+            parameter = self.chatEdit.text().split(' ')
+            if sysCmd[0] == "join" and parameter[1] is not None:
+                self.mynamelabel.setText("hi, {}\n you are on channel {}".format(self.CLIENT.USERNAME, parameter[1]))
             self.CLIENT.send_message(self.chatEdit.text())
-            self.chatEdit.clear()
-            self.chatWidget.scrollToBottom()
+        self.chatEdit.clear()
+        self.chatWidget.scrollToBottom()
 
     def exitRoom(self):
         self.chatWidget.clear()
