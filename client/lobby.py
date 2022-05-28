@@ -17,7 +17,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             ["help", "", "you can get some tips."],
             ["join", "room", "you can join room with command."],
             ["whisper", "nicname", "You can tell users secretly."],
-            ["exit", "", "exit chat room."]
+            ["whoami", "", "who are you? I'll tell you :>"]
     ]
 
     enable_cmd_tooltip = False
@@ -109,6 +109,14 @@ class lobby_window(QDialog, QWidget, lobbyForm):
                     self.chatWidget.addItem(command)
                 command = QListWidgetItem("-----------------------------------------------")
                 self.chatWidget.addItem(command)
+            elif sysCmd[0] == "whoami":
+                command = QListWidgetItem("----you are {}----".format(self.CLIENT.USERNAME))
+                self.chatWidget.addItem(command)
+            else:
+                self.CLIENT.send_message(self.chatEdit.text())
+
+
+
 
         self.chatEdit.clear()
         self.chatWidget.scrollToBottom()
