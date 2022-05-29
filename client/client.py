@@ -51,7 +51,6 @@ class Client:
             return
         print("Connected!!")
         print("All packets through this chat are interacting by specific encryption.")
-        print(f"Client IP: {self.IP_ADDRESS}.")
 
         # 컨 + C 또는 강제 종료되는 경우 서버 정상 종료
         signal.signal(signal.SIGINT, self.CLIENT.close)
