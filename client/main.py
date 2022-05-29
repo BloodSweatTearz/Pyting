@@ -65,7 +65,6 @@ class login_class(QMainWindow, loginForm):
             self.lobby_window.refreshRoomList(None)
             self.lobby_window.exec()
         else:
-            self.CLIENT.reconnect()
             QMessageBox.about(self, "error", 'login Failed :(')
             
 if __name__ == "__main__":
