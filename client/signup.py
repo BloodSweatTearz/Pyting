@@ -1,5 +1,5 @@
+#-*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox, QLineEdit
-
 from ui.pytingUI import signupForm, center, fix_window_size
 
 class signup_window(QDialog, QWidget, signupForm):
@@ -24,7 +24,7 @@ class signup_window(QDialog, QWidget, signupForm):
 
         if(pw == pw_re):
             is_success = self.CLIENT.register(username, pw)
-            print("DEBUG register : ",is_success)
+            #print("DEBUG register : ",is_success)
             if(is_success):
                 QMessageBox.about(self, "Register", 'Register Success!')    
                 self.CLIENT.reconnect()

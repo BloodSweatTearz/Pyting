@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+#-*- coding: utf-8 -*-
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 from getpass import getpass
@@ -41,16 +42,16 @@ class Client:
         self.USERLIST = []
 
     def setup(self):
-        print("Attempting to connect to server...", end=' ')
+        print("Attempting to connect to chat server...", end=' ')
         try:
             self.CLIENT.connect((self.IP_ADDRESS, self.PORT))
         except ConnectionRefusedError:
-            print("Failed!\n")
+            print("Failed..\n")
             self.ACTIVE = False
             return
-        print("Connected!")
+        print("Connected!!")
         print("All packets through this chat are interacting by specific encryption.")
-        print(f"Client connected to server at {self.IP_ADDRESS}.")
+        print(f"Client IP: {self.IP_ADDRESS}.")
 
         # 컨 + C 또는 강제 종료되는 경우 서버 정상 종료
         signal.signal(signal.SIGINT, self.CLIENT.close)
@@ -95,7 +96,7 @@ class Client:
         # recv result
         info_result = self.receive_message()
         if(info_result['msg'] == True): # msg가 참이면 회원가입 성공
-            print("[O] Register Success!")
+            #print("[O] Register Success!")
             return True
         return False
 
@@ -128,7 +129,7 @@ class Client:
     # data to json
     def dtoj(self, cmd, msg):
         if cmd.value is None:
-            print("[dtoj] Error, cmd value is None")
+            #print("[dtoj] Error, cmd value is None")
             return ""
         return json.dumps({"username": self.USERNAME, "room_uuid": self.CURRENT_ROOM, "cmd": cmd.value, "msg": msg})
 
@@ -180,12 +181,12 @@ class Client:
             try:
                 message = self.CLIENT.recv(self.RECV_SIZE).decode("utf8")
             except Exception as e: # socket.timeout
-                print("RECV TIMEOUT!!! : ",e) # reset
+                #print("RECV TIMEOUT!!! : ",e) # reset
                 self.CLIENT.settimeout(None)
                 return {'msg' : "Decrypt Error!"}
             self.CLIENT.settimeout(None) # reset
 
-            print("DEBUG[message] :",message)
+            #print("DEBUG[message] :",message)
             message = packet_decrypt(message)
             message = self.jtod(message) # 받은 json을 data로 변경
             if(message["msg"] == "Decrypt Error!"):

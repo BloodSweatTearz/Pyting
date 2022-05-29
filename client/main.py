@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 import sys
 
 from PyQt5.QtGui import QPixmap
@@ -56,7 +57,7 @@ class login_class(QMainWindow, loginForm):
             return
 
         is_success = CLIENT.login_check(id, pw)
-        debug_print(is_success)
+        #debug_print(is_success)
         if is_success:
             self.hide()
             self.lobby_window = lobby_window(self.CLIENT)
@@ -68,7 +69,7 @@ class login_class(QMainWindow, loginForm):
             QMessageBox.about(self, "error", 'login Failed :(')
             
 if __name__ == "__main__":
-    SERVER_IP = "localhost"
+    SERVER_IP = "3.37.216.226"
     SERVER_PORT = 8000
     CLIENT = Client(IP_ADDRESS=SERVER_IP, PORT=SERVER_PORT)
     

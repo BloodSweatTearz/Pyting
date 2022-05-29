@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 import functools
 import re
 
@@ -103,7 +104,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             self.drawChat("me", message)
         elif (sysCmd is not None) and (self.chatEdit.text().find(sysCmd[0]) == 1):
             #채팅이 아니라 명령어 실행
-            print("명령어!!")
+            #print("명령어!!")
             parameter = self.chatEdit.text().split(' ')
             if sysCmd[0] == "join" and parameter[1] is not None:
                 self.mynamelabel.setText("hi, {}\n you are on channel {}".format(self.CLIENT.USERNAME, parameter[1]))
@@ -112,7 +113,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
                 command = QListWidgetItem("----chatting command helper----")
                 self.chatWidget.addItem(command)
                 for command in self.cmd:
-                    print(command)
+                    #print(command)
                     command = QListWidgetItem("/{} {} - {}".format(command[0], command[1], command[2]))
                     self.chatWidget.addItem(command)
                 command = QListWidgetItem("-----------------------------------------------")

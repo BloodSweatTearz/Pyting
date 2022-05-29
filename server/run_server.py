@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+#-*- coding: utf-8 -*-
 import argparse
 from server import Server
 
@@ -12,7 +13,7 @@ def version():
     
 def argparse_init():
     parser = argparse.ArgumentParser(description='Pything - Server')
-    parser.add_argument('--ipaddress', '-i', help='Set server ip address', default="127.0.0.1")
+    parser.add_argument('--ipaddress', '-i', help='Set server ip address', default="172.26.1.157")
     parser.add_argument('--port', '-p', help='Set server bind port', default=8000)
     parser.add_argument('--maxclient', '-l', help='set max client', default=100)
     parser.add_argument('--recvsize', '-c', help='set recvsize', default=4096)

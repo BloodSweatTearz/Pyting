@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+#-*- coding: utf-8 -*-
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread, Lock
 import sys
@@ -12,9 +13,6 @@ from cipher import *
 from commands import Cmd
 
 emoticons = js.loads(open("../server/emoticons.json", "r").read())
-#rooms = {"하이": {"id": str(uuid1()), "members": []}}
-#rooms = {"general": {"id": str(uuid1()), "members": []}}
-users = { "asdf": "1234" , "pang": "1234", "qwer": "1234"}
 ADMIN_PERM = True
 welcome_msgs = [
     " 채널 문을 박차고 들어오셨습니다.",
