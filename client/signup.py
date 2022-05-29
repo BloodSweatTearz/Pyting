@@ -25,9 +25,7 @@ class signup_window(QDialog, QWidget, signupForm):
         if(pw == pw_re):
             is_success = self.CLIENT.register(username, pw)
             if(is_success):
-                QMessageBox.about(self, "Register", 'Register Success!')    
-                self.CLIENT.reconnect()
+                QMessageBox.about(self, "Register", 'Register Success!')
                 return                
         QMessageBox.about(self, "Register", 'Register Failed :(')
-        self.CLIENT.reconnect()
         return
