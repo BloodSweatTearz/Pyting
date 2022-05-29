@@ -133,7 +133,6 @@ class Server:
     def list_chat_room(self):
         return self.rooms.keys()
 
-
     """
      flag:
       0 = c.send
@@ -203,8 +202,6 @@ class Server:
                 username = recv_packet['msg']['id']
                 self.CLIENT_LIST[c] = username
                 print(self.CLIENT_LIST)
-            private_string = "[" + username + "] "
-            print(private_string)
 
             if recv_cmd == Cmd.Chat.value:
                 if message == '':
@@ -213,9 +210,9 @@ class Server:
                     message = message.replace(name, emoticons[name])
                 self.send_to_client(chan=chan, username=username, msg=message, flag=1)
             elif recv_cmd == Cmd.Command.value:
-                is_success, chan = self.command_handler(message=message, username=username, private_string=private_string, c=c, chan=chan)
+                is_success, chan = self.command_handler(message=message, username=username, c=c, chan=chan)
                 if(is_success):
-                    break
+                    pass
                 continue
             elif recv_cmd == Cmd.Login.value:
                 login_success = self.user_login_check(recv_packet)
@@ -223,21 +220,17 @@ class Server:
                     self.send_to_client(c=c, username=username, msg=True, flag=0)
                 else:
                     self.send_to_client(c=c, username=username, msg=False, flag=0)
-                    break
             elif recv_cmd == Cmd.Register.value:
                 if self.add_user(recv_packet['msg']['id'], recv_packet['msg']['pw']):
                     self.send_to_client(c=c, username=username, msg=True, flag=0)
                 else:
                     self.send_to_client(c=c, username=username, msg=False, flag=0)
-                break
             elif recv_cmd == Cmd.MakeRoom.value:
                 self.make_chat_room(recv_packet['room'])
-                break
             elif recv_cmd == Cmd.ListRoom.value:
                 self.list_chat_room()
-                break
 
-    def command_handler(self, message='', username='', private_string='', c=None, chan=None):
+    def command_handler(self, message='', username='', c=None, chan=None):
         if message == '':
             return False, chan # continue
         if message == "/quit":
@@ -294,7 +287,6 @@ class Server:
                         print("HEERERE : ",e)
                         return False, chan # continue
         return False, chan
-
 
     def receive_command(self):
         while self.ACTIVE:
