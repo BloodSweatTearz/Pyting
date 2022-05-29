@@ -188,8 +188,8 @@ class Server:
             recv_packet = js.loads(recv_packet)
             message = recv_packet['msg']
             if message == "Decrypt Error!":
-                print("Error in client_thread():", message)
-                break
+                #print("Error in client_thread():", message)
+                continue
 
             recv_cmd = recv_packet['cmd']
             print("DEBUG recv_cmd : ",recv_cmd)
