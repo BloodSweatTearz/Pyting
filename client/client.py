@@ -221,7 +221,6 @@ class Client:
     def print_message(self, lobbyForm):
         while self.ACTIVE:
             packet_data = self.receive_message()
-            # error !!!!!
             if(
                 packet_data == None
                 or

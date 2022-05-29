@@ -1,24 +1,22 @@
 #-*- coding: utf-8 -*-
 import functools
 import re
+import sys
 
 from PyQt5.QtGui import QPixmap, QColor, QTextCursor
 from PyQt5.QtWidgets import QWidget, QDialog, QListWidgetItem, QMessageBox
-
 from ui.pytingUI import lobbyForm, center, fix_window_size
 
-import sys
 sys.path.append("../")
 from cipher import *
 from server.server import emoticons
 
 class lobby_window(QDialog, QWidget, lobbyForm):
-
     cmd = [ # command, parameter, detail tips
-            ["help", "", "you can get some tips."],
-            ["join", "room", "you can join room with command."],
-            ["whisper", "nicname", "You can tell users secretly."],
-            ["whoami", "", "who are you? I'll tell you :>"]
+            ["help", "", "You can get some tips."],
+            ["join", "room", "You can join room with command."],
+            ["whisper", "nickname", "You can tell users secretly."],
+            ["whoami", "", "Who are you? I'll let you whou you are. :>"]
     ]
 
     enable_cmd_tooltip = False
@@ -29,7 +27,6 @@ class lobby_window(QDialog, QWidget, lobbyForm):
         self.show()
         self.form_size(0)
         center(self)
-        #self.create_dummy()
 
         #Event Mapping
         self.makeChatEdit.returnPressed.connect(self.makeChat)
@@ -104,7 +101,6 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             self.drawChat("me", message)
         elif (sysCmd is not None) and (self.chatEdit.text().find(sysCmd[0]) == 1):
             #채팅이 아니라 명령어 실행
-            #print("명령어!!")
             parameter = self.chatEdit.text().split(' ')
             if sysCmd[0] == "join" and parameter[1] is not None:
                 self.mynamelabel.setText("hi, {}\n you are on channel {}".format(self.CLIENT.USERNAME, parameter[1]))
@@ -113,7 +109,6 @@ class lobby_window(QDialog, QWidget, lobbyForm):
                 command = QListWidgetItem("----chatting command helper----")
                 self.chatWidget.addItem(command)
                 for command in self.cmd:
-                    #print(command)
                     command = QListWidgetItem("/{} {} - {}".format(command[0], command[1], command[2]))
                     self.chatWidget.addItem(command)
                 command = QListWidgetItem("-----------------------------------------------")
