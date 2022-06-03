@@ -17,7 +17,7 @@ class lobby_window(QDialog, QWidget, lobbyForm):
             ["help", "", "You can get some tips."],
             ["join", "room", "You can join room with command."],
             ["whisper", "nickname", "You can tell users secretly."],
-            ["whoami", "", "Who are you? I'll let you whou you are. :>"]
+            ["whoami", "", "Who are you? I'll let you know who you are. :>"]
     ]
 
     enable_cmd_tooltip = False
