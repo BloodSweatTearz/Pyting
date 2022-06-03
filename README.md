@@ -7,6 +7,17 @@
 
 [**[시연 영상 - YouTube]**](https://youtu.be/Ehr_PJAap1k)
 
+### Features 
+
+1. 로그인/회원가입
+2. 암호화 통신 지원
+3. 비밀번호 SHA512 방식 해쉬화
+4. 이모티콘
+5. 귓속말
+6. 채널 생성/접속
+7. 관리자 공지
+8. 사용자 관리
+
 ### Server Usage
 
   ```bash
@@ -27,17 +38,6 @@
                           set recvsize
     --version, -v         set version
   ```
-
-
-### Features
-1. 로그인/회원가입
-2. 암호화 통신 지원
-3. 비밀번호 SHA512 방식 해쉬화
-4. 이모티콘
-5. 귓속말
-6. 채널 생성/접속
-7. 관리자 공지
-8. 사용자 관리
 
 ### Server Commands
 1. /say : 전체 알림 기능
