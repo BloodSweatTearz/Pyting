@@ -68,6 +68,14 @@ class login_class(QMainWindow, loginForm):
             self.lobby_window.exec()
         else:
             QMessageBox.about(self, "error", 'login Failed :(')
+
+    def forgot_event(self, event):
+        print("called")
+        msgBox = QMessageBox(self)
+        thinkingface = QPixmap("./imgResource/thinkingface.png")
+        msgBox.setIconPixmap(thinkingface)
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        msgBox.exec()
             
 if __name__ == "__main__":
     SERVER_IP = "3.37.216.226"
