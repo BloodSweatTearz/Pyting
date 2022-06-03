@@ -70,7 +70,6 @@ class login_class(QMainWindow, loginForm):
             QMessageBox.about(self, "error", 'login Failed :(')
 
     def forgot_event(self, event):
-        print("called")
         msgBox = QMessageBox(self)
         thinkingface = QPixmap("./imgResource/thinkingface.png")
         msgBox.setIconPixmap(thinkingface)
