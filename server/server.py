@@ -11,6 +11,7 @@ import random as rd
 sys.path.append("../")
 from cipher import *
 from commands import Cmd
+from debug import *
 
 emoticons = js.loads(open("../server/emoticons.json", "r").read())
 ADMIN_PERM = True
@@ -71,7 +72,7 @@ class Server:
     # close server
     def close(self):
         self.ACTIVE = False
-        print("ACTIVE : ", self.ACTIVE)
+        debug.debug_print("ACTIVE : ", self.ACTIVE)
         print("Close Server...")
         self.SERVER.close()
 
@@ -86,12 +87,12 @@ class Server:
     def user_login_check(self, user_info):
         user_id = user_info['msg']['id'].replace(' ', '_')
         user_pw = user_info['msg']['pw']
-        print("DEBUG1 : ",user_id, user_pw)
+        debug.debug_print("DEBUG1 : ",user_id, user_pw)
         try:
             if self.USERS[user_id] == user_pw:
                 return True
         except Exception as e:
-            print("login error:", e)
+            debug.debug_print("login error:", e)
         return False
 
     # 서버 바인딩
@@ -112,7 +113,7 @@ class Server:
 
     def listen_incoming(self):
         self.SERVER.listen(self.MAX_CLIENTS)
-        print(f"Currently listening for up to {self.MAX_CLIENTS} clients...\n")
+        debug.debug_print(f"Currently listening for up to {self.MAX_CLIENTS} clients...\n")
         while self.ACTIVE:
             self.load_users()
             (client, address) = self.SERVER.accept()
@@ -141,8 +142,8 @@ class Server:
       3 = whisper_flag used (chan needed)
     """
     def send_to_client(self, chan=None, msg='', flag=0, c=[], username=''):
-        print("DEBUG_send_to_client1 : ",msg)
-        print("DEBUG_send_to_client2 : ",self.rooms)
+        debug.debug_print("DEBUG_send_to_client1 : ", msg)
+        debug.debug_print("DEBUG_send_to_client2 : ", self.rooms)
         if flag == 0:
             c.send(packet_encrypt(js.dumps({"rooms": self.rooms, "username" : username, "msg": msg})).encode(encoding="utf-8"))
         elif flag == 1:
@@ -174,7 +175,7 @@ class Server:
         with open(self.USER_INFO_FILENAME, 'w') as fp:
             fp.write(js.dumps(user_info))
 
-        print(f"[O] Register Success : {username}, {password}")
+        debug.debug_print(f"[O] Register Success : {username}, {password}")
         self.load_users()
         self.LOCK.release()
         return True
@@ -188,11 +189,14 @@ class Server:
             recv_packet = js.loads(recv_packet)
             message = recv_packet['msg']
             if message == "Decrypt Error!":
-                print("Error in client_thread():", message)
-                break
+<<<<<<< HEAD
+=======
+                #print("Error in client_thread():", message)
+>>>>>>> 4cce9f6dc5f9fb9791919597a93b2a02b665a2be
+                continue
 
             recv_cmd = recv_packet['cmd']
-            print("DEBUG recv_cmd : ",recv_cmd)
+            debug.debug_print("DEBUG recv_cmd : ",recv_cmd)
 
             if(
                 recv_cmd == Cmd.Login.value
@@ -201,7 +205,7 @@ class Server:
             ):
                 username = recv_packet['msg']['id']
                 self.CLIENT_LIST[c] = username
-                print(self.CLIENT_LIST)
+                debug.debug_print(self.CLIENT_LIST)
 
             if recv_cmd == Cmd.Chat.value:
                 if message == '':
@@ -243,7 +247,7 @@ class Server:
             message = message.replace("/whoami", " * " + username, 1)
             self.send_to_client(chan=chan, msg=message, flag=1)
         elif message.startswith("/whisper"): # whispher
-            print('whisper')
+            debug.debug_print('whisper')
             if len(message.split(' ')) > 2:
                 data = message.split(' ', 2)
                 user = data[1]
@@ -267,24 +271,22 @@ class Server:
                         return False, chan # continue
                 if cmd[0] == "/join":
                     try:
-                        print(f" * join join ~")
+                        debug.debug_print(f" * join join ~")
                         if username in self.rooms[chan['name']]["members"]:
                             self.rooms[chan['name']]["members"].remove(username)
                         if cmd[1] in self.rooms.keys():
-                            print(1)
                             if(username not in self.rooms[cmd[1]]["members"]):
                                 self.rooms[cmd[1]]["members"].append(username)
                         else:
-                            print(2)
-                            print({cmd[1]: {"id": str(uuid1()), "members": [username]}})
+                            debug.debug_print({cmd[1]: {"id": str(uuid1()), "members": [username]}})
                             self.rooms.update({cmd[1]: {"id": str(uuid1()), "members": [username]}})
-                        print(self.rooms)
-                        print('username:', username)
-                        print('channame',chan['name'])
+                        debug.debug_print(self.rooms)
+                        debug.debug_print('username:', username)
+                        debug.debug_print('channame',chan['name'])
                         chan = {"name": cmd[1], "id": self.rooms[cmd[1]]['id']}
                         self.send_to_client(chan=chan, msg=f"[*] {username}님이 " + cmd[1] + welcome_msgs[rd.randrange(255) % len(welcome_msgs)], flag=1)
                     except Exception as e:
-                        print("HEERERE : ",e)
+                        debug.debug_print("HEERERE : ",e)
                         return False, chan # continue
         return False, chan
 
@@ -322,7 +324,7 @@ class Server:
             elif command.startswith("/rooms"):
                 print(self.rooms)
             elif command.startswith("/make"):
-                print("make room~")
+                debug.debug_print("make room~")
                 if comment[1] != None:
                     self.make_chat_room(comment[1])
                     print("room list : ", self.list_chat_room())
@@ -341,14 +343,14 @@ class Server:
                 c.send(packet_encrypt(m).encode(encoding="utf-8"))
                 continue
             user = self.CLIENT_LIST[c]
-            print("user:", user)
-            print("chan:", self.rooms[chan['name']]['members'])
-            print("chan1:", chan)
-            print("user가 chan에 해당하는지 비교")
+            debug.debug_print("user:", user)
+            debug.debug_print("chan:", self.rooms[chan['name']]['members'])
+            debug.debug_print("chan1:", chan)
+            debug.debug_print("user가 chan에 해당하는지 비교")
             if user in self.rooms[chan['name']]['members']:
                 c.send(packet_encrypt(m).encode(encoding="utf-8"))
-                print("send_all success!")
-        print("print in server send_all(): ", m)
+                debug.debug_print("send_all success!")
+        debug.debug_print("print in server send_all(): ", m)
 
     def send_user(self, m, u, chan):
         for c in self.CLIENT_LIST:
@@ -360,9 +362,9 @@ class Server:
             if user in self.rooms[chan['name']]['members']:
                 if user == u['receiver']:
                     c.send(packet_encrypt(m).encode(encoding="utf-8"))
-                    print('user',user)
-                    print('u',u)
-                    print('m',m)
+                    debug.debug_print('user',user)
+                    debug.debug_print('u',u)
+                    debug.debug_print('m',m)
 
 if __name__ == "__main__":
     if(len(sys.argv) > 1):

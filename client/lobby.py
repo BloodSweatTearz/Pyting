@@ -10,6 +10,7 @@ from ui.pytingUI import lobbyForm, center, fix_window_size
 sys.path.append("../")
 from cipher import *
 from server.server import emoticons
+from debug import *
 
 class lobby_window(QDialog, QWidget, lobbyForm):
     cmd = [ # command, parameter, detail tips

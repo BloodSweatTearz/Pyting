@@ -12,6 +12,7 @@ import sys
 sys.path.append("../")
 from cipher import *
 from commands import Cmd
+from debug import *
 
 class Client:
     def __init__(self, IP_ADDRESS="127.0.0.1", PORT=8000, RECV_SIZE=4096):
@@ -95,7 +96,7 @@ class Client:
         # recv result
         info_result = self.receive_message()
         if(info_result['msg'] == True): # msg가 참이면 회원가입 성공
-            #print("[O] Register Success!")
+            debug_print("[O] Register Success!")
             return True
         return False
 
@@ -118,7 +119,7 @@ class Client:
     # 룸 유저정보 초기화
     def room_member_list_refresh(self, recv_packet):
         if not self.where_am_i(recv_packet):
-            print("현재 위치 저장 실패")
+            debug_print("현재 위치 저장 실패")
 
         # if(recv_packet['rooms']["current_room_uuid"] != -1):
         #     self.USERLIST = recv_packet["members"]
@@ -128,7 +129,7 @@ class Client:
     # data to json
     def dtoj(self, cmd, msg):
         if cmd.value is None:
-            #print("[dtoj] Error, cmd value is None")
+            debug_print("[dtoj] Error, cmd value is None")
             return ""
         return json.dumps({"username": self.USERNAME, "room_uuid": self.CURRENT_ROOM, "cmd": cmd.value, "msg": msg})
 
@@ -155,7 +156,7 @@ class Client:
 
     def send_message(self, message):
         if self.CURRENT_ROOM == -1:
-            print("[send_message] Error, WHERE ROOM?")
+            debug_print("[send_message] Error, WHERE ROOM?")
             return
         # try:
         send_packet = None
@@ -168,7 +169,7 @@ class Client:
                 send_packet = self.dtoj(Cmd.Chat, message)
         self.CLIENT.send(bytes(packet_encrypt(send_packet), "utf8"))
         # except:
-        #     print("Exception Detected!")
+        #     debug_print("Exception Detected!")
         #     self.ACTIVE = False
         #     self.CLIENT.send(bytes(packet_encrypt("/quit")))
         #     import os
@@ -180,12 +181,12 @@ class Client:
             try:
                 message = self.CLIENT.recv(self.RECV_SIZE).decode("utf8")
             except Exception as e: # socket.timeout
-                #print("RECV TIMEOUT!!! : ",e) # reset
+                #debug_print("RECV TIMEOUT!!! : ",e) # reset
                 self.CLIENT.settimeout(None)
                 return {'msg' : "Decrypt Error!"}
             self.CLIENT.settimeout(None) # reset
 
-            #print("DEBUG[message] :",message)
+            #debug_print("DEBUG[message] :",message)
             message = packet_decrypt(message)
             message = self.jtod(message) # 받은 json을 data로 변경
             if(message["msg"] == "Decrypt Error!"):
