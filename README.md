@@ -3,7 +3,7 @@
 
 ## Overview
 
-종단간 암호화 통신을 사용하는 단체 채팅 프로그램
+종단간 AES 암호화 통신을 사용하는 단체 채팅 프로그램
 
 [**[시연 영상 - YouTube]**](https://youtu.be/Ehr_PJAap1k)
 
