@@ -237,7 +237,10 @@ class Client:
 
             if packet_data["username"] != self.USERNAME:
                 from PyQt5.QtWidgets import QListWidgetItem
-                item = QListWidgetItem('[{}] {}'.format(packet_data["username"], packet_data["msg"]))
+                item_str = '[{}] {}'.format(packet_data["username"], packet_data["msg"])
+                if packet_data["username"] == "":
+                    item_str = '{}'.format(packet_data["msg"])
+                item = QListWidgetItem(item_str)
                 lobbyForm.chatWidget.addItem(item)
                 lobbyForm.chatWidget.scrollToBottom()
             lobbyForm.chatWidget.scrollToBottom()
