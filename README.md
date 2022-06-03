@@ -46,16 +46,14 @@
 4. /rooms : 모든 채팅방 목록
 
 ## How to
-### Requirement
-1. pycrypto
-
-### Common Basic Setup
+### Requirements
+#### Common Basic Setup
 
 ```bash
 $ pip install pycrypto
 ```
 
-### Common Client Basic Setup
+#### Common Client Basic Setup
 ```bash
 $ pip install pyqt
 $ pip install qt-material
