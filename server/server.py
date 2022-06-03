@@ -296,12 +296,6 @@ class Server:
                     self.send_to_client(chan=ADMIN_PERM, msg="[Notice] {}".format(comment[1]), flag=1, username="ADMIN")
                 else:
                     print(f"Usage: {comment[0]} [something]")
-            elif command.startswith("/kick"):
-                user = command.split(' ', 2)
-                if len(command.split(' ')) > 1:
-                    self.send_to_client(chan=ADMIN_PERM, msg="you kicked", flag=2, username=user[1])
-                else:
-                    print(f"Usage: {user[0]} [username] [reason]")
             elif command.startswith("/shutdown"):
                 choose = input("Are you sure to shutdown the server? (y/n):")
                 if choose == 'y':
@@ -319,15 +313,8 @@ class Server:
                     print("\nNo one connected to this server..\n")
             elif command.startswith("/rooms"):
                 print(self.rooms)
-            elif command.startswith("/make"):
-                debug.debug_print("make room~")
-                if comment[1] != None:
-                    self.make_chat_room(comment[1])
-                    print("room list : ", self.list_chat_room())
-                else:
-                    print("input Parameter!!!!")
             elif command.startswith('/') or command.startswith("/help"):
-                print("\nAvailable Commands: say, kick, shutdown, users\n")
+                print("\nAvailable Commands: say, shutdown, users, rooms\n")
             elif command == '':
                 pass
             else:
