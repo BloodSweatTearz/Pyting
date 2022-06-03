@@ -45,7 +45,7 @@
 3. /users : 모든 사용자 목록
 4. /rooms : 모든 채팅방 목록
 
-## How to
+## How to install?
 ### Requirements
 #### Common Basic Setup
 
@@ -58,6 +58,8 @@ $ pip install pycrypto
 $ pip install pyqt
 $ pip install qt-material
 ```
+
+## How to execute?
 ### Server 
 **[리눅스]**
 
