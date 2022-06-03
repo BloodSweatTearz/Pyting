@@ -1,4 +1,5 @@
 #-*- coding: utf-8 -*-
+import functools
 import sys
 
 from PyQt5.QtGui import QPixmap
@@ -33,6 +34,7 @@ class login_class(QMainWindow, loginForm):
         self.loadLogo()
         self.registerBtn.clicked.connect(self.signup_event)
         self.loginBtn.clicked.connect(self.login_event)
+        self.findpassword.mousePressEvent = functools.partial(self.forgot_event)
 
         self.CLIENT = Client
         self.CLIENT.setup()
