@@ -89,6 +89,6 @@ chmod 777 client/main.py
 **[윈도우]**
 
 ```
-python client/main.py python3 
-client/main.py
+python client/main.py
+python3 client/main.py
 ```
