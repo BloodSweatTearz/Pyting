@@ -158,7 +158,6 @@ class Server:
     def message_format(self, username, message):
         return { 'username': username, 'msg': message }
 
-    # password는 아직은 평문
     def add_user(self, username, password): # register
         username = username.replace(' ', '_')
         user_info = {}
