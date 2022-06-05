@@ -77,7 +77,7 @@ class login_class(QMainWindow, loginForm):
         msgBox.exec()
             
 if __name__ == "__main__":
-    SERVER_IP = "3.37.216.226"
+    SERVER_IP = "127.0.0.1"
     SERVER_PORT = 8000
     CLIENT = Client(IP_ADDRESS=SERVER_IP, PORT=SERVER_PORT)
     
